@@ -1,6 +1,6 @@
 # RootedWealth
 
-**Developed by:** John, Steve, and Layla  
+**Developed by:** Raees, Simon, and Kayla  
 
 ---
 
