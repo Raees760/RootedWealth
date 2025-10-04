@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/add_income_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:tag="themed_background">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add New Income"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:tag="themed_text"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/etIncomeAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Amount (ZAR)"
+        android:inputType="numberDecimal"
+        android:tag="themed_input"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/etIncomeSource"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Source (e.g., Salary, Gift)"
+        android:tag="themed_input"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnIncomeDatePicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select Date (Today)"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnSaveIncome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save Income"
+        android:tag="themed_accent"/>
+</LinearLayout>

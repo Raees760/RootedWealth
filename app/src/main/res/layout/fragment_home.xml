@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/home_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:tag="themed_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header panel -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            android:tag="themed_panel"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:id="@+id/header_panel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:tag="themed_panel">
+
+                <TextView
+                    android:id="@+id/tvGreeting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hello, User!"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:tag="themed_text" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Monthly Progress"
+                    android:textSize="16sp"
+                    android:tag="themed_text"
+                    android:layout_marginTop="8dp"/>
+
+                <ProgressBar
+                    android:id="@+id/pbMonthlyProgress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="12dp"
+                    android:layout_marginTop="4dp"
+                    android:progress="65"
+                    android:progressDrawable="@drawable/custom_progress_bar" />
+
+                <TextView
+                    android:id="@+id/tvBudgetRatio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="R13000 / R20000"
+                    android:tag="themed_text"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="4dp"/>
+
+                <!-- Streaks and Coins placeholder -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="12dp">
+                    <TextView android:id="@+id/tvStreak" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="🔥 Streak: 5 Days" android:tag="themed_text"/>
+                    <TextView android:id="@+id/tvCoins" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="💰 Coins: 120" android:gravity="end" android:tag="themed_text"/>
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- Category overview -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:tag="themed_panel"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:tag="themed_panel">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Spending by Category"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:tag="themed_text" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:layout_marginTop="8dp">
+
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/pieChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <TextView
+                        android:id="@+id/tvNoDataChart"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="No expenses added this month."
+                        android:tag="themed_text"
+                        android:visibility="gone"/>
+                </FrameLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+
+        <!-- Quick actions -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:gravity="center">
+            <Button android:id="@+id/btnAddExpense" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="Add Expense" android:tag="themed_accent"/>
+            <Button android:id="@+id/btnAddIncome" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="Add Income" android:layout_marginStart="8dp"/>
+            <Button android:id="@+id/btnSettings" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⚙️" android:layout_marginStart="8dp"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

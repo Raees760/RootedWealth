@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- For API 33 and above -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <!-- For versions up to API 32 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.RootedWealth">
+
+
+        <activity android:name=".add.AddExpenseActivity" />
+        <activity android:name=".settings.SettingsActivity" />
+        <activity android:name=".ui.rewards.RewardsActivity" />
+        <activity android:name=".add.AddIncomeActivity" />
+        <activity
+            android:name=".ui.tutorial.TutorialActivity"
+            android:label="Tutorial"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

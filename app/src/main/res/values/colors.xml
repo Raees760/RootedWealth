@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- defaults -->
+    <color name="primary_default">#F5F5F5</color>
+    <color name="accent_default">#1E88E5</color>
+    <color name="text_default">#212121</color>
+
+    <!-- rosy -->
+    <color name="rosy_panel">#FCE4EC</color>
+    <color name="rosy_accent">#F06292</color>
+    <color name="text_on_rosy">#4A148C</color>
+
+    <!-- spiderman (fallback color if image not available) -->
+    <color name="spiderman_fallback">#0D47A1</color>
+    <color name="spiderman_accent">#D32F2F</color>
+    <color name="text_on_spiderman">#FFFFFF</color>
+
+    <!-- Budget Colors -->
+    <color name="budget_green">#4CAF50</color>
+    <color name="budget_amber">#FFC107</color>
+    <color name="budget_red">#F44336</color>
+</resources>
