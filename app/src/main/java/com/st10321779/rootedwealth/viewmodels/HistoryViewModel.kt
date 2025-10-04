@@ -7,14 +7,21 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import com.st10321779.rootedwealth.data.local.AppDatabase
+import com.st10321779.rootedwealth.data.local.dao.CategorySpending
 import com.st10321779.rootedwealth.data.model.HistoryItem
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
+import kotlin.math.min
 
 enum class FilterPeriod {
     TODAY, WEEK, MONTH, LAST_MONTH
 }
+
+// Data class to hold the result of our tracker calculation
+data class AlignmentTrackerInfo(val label: String, val insight: String)
 
 class HistoryViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -24,34 +31,34 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
 
     private val _dateRange = MutableLiveData<Pair<Date, Date>>()
 
-    // These are now private, intermediate LiveData sources
-    private val expensesForPeriod: LiveData<List<HistoryItem.ExpenseItem>> = _dateRange.switchMap { (start, end) ->
-        expenseDao.getExpensesWithCategoryInPeriod(start, end)
-    }.map { list -> list.map { HistoryItem.ExpenseItem(it) } }
+    val combinedHistory: MediatorLiveData<List<HistoryItem>> = MediatorLiveData()
 
-    private val incomeForPeriod: LiveData<List<HistoryItem.IncomeItem>> = _dateRange.switchMap { (start, end) ->
-        incomeDao.getIncomeInPeriod(start, end)
-    }.map { list -> list.map { HistoryItem.IncomeItem(it) } }
-
-    // This is the public LiveData the UI will observe.
-    // It merges the two sources together.
-    val combinedHistory = MediatorLiveData<List<HistoryItem>>()
-
-    init {
-        // The MediatorLiveData needs to observe its sources.
-        combinedHistory.addSource(expensesForPeriod) { mergeAndPost() }
-        combinedHistory.addSource(incomeForPeriod) { mergeAndPost() }
-
-        // Set the initial period
-        setPeriod(FilterPeriod.MONTH)
+    val spendingByCategory: LiveData<List<CategorySpending>> = _dateRange.switchMap { (start, end) ->
+        expenseDao.getSpendingByCategory(start, end)
     }
 
-    private fun mergeAndPost() {
-        val expenses = expensesForPeriod.value ?: emptyList()
-        val income = incomeForPeriod.value ?: emptyList()
+    private val _alignmentTrackerData = MutableLiveData<AlignmentTrackerInfo>()
+    val alignmentTrackerData: LiveData<AlignmentTrackerInfo> = _alignmentTrackerData
 
-        val combinedList = (expenses + income).sortedByDescending { it.date }
-        combinedHistory.value = combinedList
+    init {
+        val expensesForPeriod = _dateRange.switchMap { (start, end) ->
+            expenseDao.getExpensesWithCategoryInPeriod(start, end)
+        }.map { list -> list.map { HistoryItem.ExpenseItem(it) } }
+
+        val incomeForPeriod = _dateRange.switchMap { (start, end) ->
+            incomeDao.getIncomeInPeriod(start, end)
+        }.map { list -> list.map { HistoryItem.IncomeItem(it) } }
+
+        combinedHistory.addSource(expensesForPeriod) { mergeAndPost(it, incomeForPeriod.value) }
+        combinedHistory.addSource(incomeForPeriod) { mergeAndPost(expensesForPeriod.value, it) }
+
+        setPeriod(FilterPeriod.MONTH)
+        calculateAlignmentTracker()
+    }
+
+    private fun mergeAndPost(expenses: List<HistoryItem.ExpenseItem>?, income: List<HistoryItem.IncomeItem>?) {
+        val combinedList = (expenses ?: emptyList()) + (income ?: emptyList())
+        combinedHistory.value = combinedList.sortedByDescending { it.date }
     }
 
     fun setPeriod(period: FilterPeriod) {
@@ -59,11 +66,7 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
         val endDate = calendar.time
 
         when (period) {
-            FilterPeriod.TODAY -> {
-                calendar.set(Calendar.HOUR_OF_DAY, 0)
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.SECOND, 0)
-            }
+            FilterPeriod.TODAY -> calendar.set(Calendar.HOUR_OF_DAY, 0)
             FilterPeriod.WEEK -> calendar.add(Calendar.DAY_OF_YEAR, -7)
             FilterPeriod.MONTH -> calendar.set(Calendar.DAY_OF_MONTH, 1)
             FilterPeriod.LAST_MONTH -> {
@@ -75,12 +78,52 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
                 return
             }
         }
-        val startDate = calendar.time
-        _dateRange.value = Pair(startDate, endDate)
+        _dateRange.value = Pair(calendar.time, endDate)
     }
 
-    // Placeholder for Alignment Tracker logic
-    fun getAlignmentTrackerData(): LiveData<String> {
-        return MutableLiveData("Alignment Tracker: Balanced Saver")
+    private fun calculateAlignmentTracker() = viewModelScope.launch {
+        val end = Calendar.getInstance().time
+        val startCal = Calendar.getInstance()
+        startCal.add(Calendar.DAY_OF_MONTH, -30)
+        val start = startCal.time
+
+        // Get raw data from DB
+        val totalIncome = incomeDao.getTotalIncomeInPeriodAsync(start, end)
+        val totalExpenses = expenseDao.getTotalExpensesInPeriodAsync(start, end)
+        val distinctLogDays = expenseDao.getDistinctLogDaysCount(start, end)
+
+        // Calculate Metrics
+        // Adherence (0.0 to 1.0) (How disciplined in recording entries)
+        val adherenceScore = min(distinctLogDays / 30.0, 1.0)
+
+        // Spending Behaviour (0.0 to 1.0, where 1.0 is a good saver)
+        val savingsRate = if (totalIncome > 0) (totalIncome - totalExpenses) / totalIncome else 0.0
+        val behaviorScore = when { // Remapping linearly
+            savingsRate < 0 -> 0.0 // In debt
+            savingsRate < 0.1 -> 0.3 // Low savings
+            savingsRate < 0.25 -> 0.7 // Good savings
+            else -> 1.0 // Excellent saver
+        }
+
+        // Determine Labels
+        val behaviorLabel = if (behaviorScore > 0.6) "Saver" else "Spender"
+        val adherenceLabel = if (adherenceScore > 0.6) "Planner" else "Chaotic"
+
+        val finalLabel = when {
+            behaviorScore > 0.6 && adherenceScore > 0.6 -> "Financial Virtuoso"
+            behaviorScore > 0.6 -> "Steady Saver"
+            adherenceScore > 0.6 -> "Diamond in the Rough"
+            else -> "Impulsive Spender"
+        }
+
+        val finalInsight = when {
+
+            behaviorScore > 0.6 && adherenceScore > 0.6 -> "You've mastered the art of wealth management. Keep up the amazing work!"
+            behaviorScore > 0.6 -> "You're on the right track with saving! Try logging your expenses daily to make your financial picture even clearer."
+            adherenceScore > 0.6 -> "You track your money diligently. Now try applying that discipline to your saving habits too!"
+            else -> "Your spending patterns show a lack of control. You need to make some drastic lifestyle changes."
+        }
+
+        _alignmentTrackerData.postValue(AlignmentTrackerInfo(finalLabel, finalInsight))
     }
 }

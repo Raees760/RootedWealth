@@ -41,6 +41,13 @@ interface ExpenseDao {
     ORDER BY e.date DESC
 """)
     fun getExpensesWithCategoryInPeriod(startDate: Date, endDate: Date): LiveData<List<ExpenseWithCategory>>
+
+    // For Analytics
+    @Query("SELECT COUNT(DISTINCT STRFTIME('%Y-%m-%d', date / 1000, 'unixepoch')) FROM expenses WHERE date BETWEEN :startDate AND :endDate")
+    suspend fun getDistinctLogDaysCount(startDate: Date, endDate: Date): Int
+
+    @Query("SELECT IFNULL(SUM(amount), 0) FROM expenses WHERE date BETWEEN :startDate AND :endDate")
+    suspend fun getTotalExpensesInPeriodAsync(startDate: Date, endDate: Date): Double
 }
 data class CategorySpending(
     val categoryName: String,
