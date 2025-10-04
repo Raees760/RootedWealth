@@ -21,4 +21,4 @@ RootedWealth is a mobile application designed to help users manage their finance
 ## 💡 Getting Started
 1. Clone the repository:
    ```bash
-   git clone https://github.com/<your-username>/RootedWealth.git
+   git clone https://github.com/Raees760/RootedWealth.git
