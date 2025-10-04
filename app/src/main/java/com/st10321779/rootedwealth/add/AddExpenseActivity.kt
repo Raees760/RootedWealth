@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.st10321779.rootedwealth.data.local.entity.Category
 import com.st10321779.rootedwealth.data.local.entity.Expense
 import com.st10321779.rootedwealth.databinding.ActivityAddExpenseBinding
@@ -151,14 +152,15 @@ class AddExpenseActivity : AppCompatActivity() {
     private fun copyImageToInternalStorage(uri: Uri): Uri? {
         return try {
             val inputStream = contentResolver.openInputStream(uri)
-            // Create a file in the app's private files directory
             val file = File(filesDir, "expense_image_${System.currentTimeMillis()}.jpg")
             val outputStream = FileOutputStream(file)
             inputStream?.copyTo(outputStream)
             inputStream?.close()
             outputStream.close()
-            // Return the URI of the newly created file
-            Uri.fromFile(file)
+
+            // THE KEY CHANGE: Get a secure content:// URI from the FileProvider
+            val authority = "${applicationContext.packageName}.provider"
+            FileProvider.getUriForFile(this, authority, file)
         } catch (e: Exception) {
             e.printStackTrace()
             null

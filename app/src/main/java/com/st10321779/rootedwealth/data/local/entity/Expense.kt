@@ -14,3 +14,15 @@ data class Expense(
     val imageUri: String?, // Store URI of the image
     val isLinked: Boolean = false // For simulated bank entries
 )
+data class ExpenseWithCategory(
+    // We don't need @Embedded here since we are selecting columns individually
+    val id: Long,
+    val amount: Double,
+    val date: Date,
+    val notes: String?,
+    val imageUri: String?,
+    val isLinked: Boolean,
+    val categoryName: String,
+    val categoryIcon: String,
+    val categoryColor: String
+)

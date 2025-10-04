@@ -12,7 +12,7 @@ RootedWealth is a mobile application designed to help users manage their finance
 ## 🚧 To-Do List
 - [ ] Merge Sign-In / Registration functionality  
 - [ ] Integrate online database features  
-- [ ] Implement History tracking  
+- [ ] Fix images not displaying in History tracking
 - [ ] Add Analytics section  
 - [ ] Fix themes not applying correctly  
 

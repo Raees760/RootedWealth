@@ -17,4 +17,5 @@ interface IncomeDao {
 
     @Query("SELECT SUM(amount) FROM income WHERE date BETWEEN :startDate AND :endDate")
     fun getTotalIncomeInPeriod(startDate: Date, endDate: Date): LiveData<Double>
+
 }

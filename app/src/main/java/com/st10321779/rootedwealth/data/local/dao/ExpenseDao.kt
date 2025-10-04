@@ -5,6 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import com.st10321779.rootedwealth.data.local.entity.Expense
+import com.st10321779.rootedwealth.data.local.entity.ExpenseWithCategory
 import java.util.Date
 
 @Dao
@@ -26,6 +27,20 @@ interface ExpenseDao {
         GROUP BY c.name
     """)
     fun getSpendingByCategory(startDate: Date, endDate: Date): LiveData<List<CategorySpending>>
+
+
+    @Query("""
+    SELECT 
+        e.id, e.amount, e.date, e.notes, e.imageUri, e.isLinked,
+        c.name as categoryName, 
+        c.icon as categoryIcon, 
+        c.color as categoryColor 
+    FROM expenses e 
+    JOIN categories c ON e.categoryId = c.id 
+    WHERE e.date BETWEEN :startDate AND :endDate 
+    ORDER BY e.date DESC
+""")
+    fun getExpensesWithCategoryInPeriod(startDate: Date, endDate: Date): LiveData<List<ExpenseWithCategory>>
 }
 data class CategorySpending(
     val categoryName: String,
