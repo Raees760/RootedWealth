@@ -13,8 +13,6 @@ RootedWealth is a mobile application designed to help users manage their finance
 - [ ] Merge Sign-In / Registration functionality  
 - [ ] Integrate online database features  
 - [ ] Fix images not displaying in History tracking
-- [ ] Add Analytics section  
-- [ ] Add/Edit/Delete Categories section  
 - [ ] Fix themes not applying correctly  
 
 ---
@@ -23,3 +21,6 @@ RootedWealth is a mobile application designed to help users manage their finance
 1. Clone the repository:
    ```bash
    git clone https://github.com/Raees760/RootedWealth.git
+
+## 💡 Video Demonstration
+[link to be added]
