@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:padding="12dp">
 
+        <!-- Compact View -->
         <View
             android:id="@+id/viewIncomeColor"
             android:layout_width="8dp"
@@ -52,5 +53,42 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             tools:text="+ R 25000.00" />
+
+        <!-- Expanded Details View -->
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/groupIncomeExpandedDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="tvIncomeFullNotes, btnIncomeEdit, btnIncomeDelete" />
+
+        <TextView
+            android:id="@+id/tvIncomeFullNotes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintTop_toBottomOf="@id/tvIncomeDate"
+            app:layout_constraintStart_toStartOf="@id/tvIncomeDate"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="Full notes about the income go here." />
+
+        <Button
+            android:id="@+id/btnIncomeEdit"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edit"
+            app:layout_constraintEnd_toStartOf="@id/btnIncomeDelete"
+            app:layout_constraintTop_toBottomOf="@id/tvIncomeFullNotes" />
+
+        <Button
+            android:id="@+id/btnIncomeDelete"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvIncomeFullNotes" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

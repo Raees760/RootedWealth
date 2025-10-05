@@ -62,4 +62,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0") // For viewModelScope
 
     implementation("androidx.viewpager2:viewpager2:1.0.0")
+
+    implementation("com.github.QuadFlask:colorpicker:0.0.13") // For Colour Picker
 }

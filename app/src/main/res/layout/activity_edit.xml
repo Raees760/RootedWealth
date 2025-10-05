@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/edit_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:tag="themed_background">
+
+    <TextView
+        android:id="@+id/tvEditTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit Transaction"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:tag="themed_text"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/etEditAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Amount (ZAR)"
+        android:inputType="numberDecimal"
+        android:tag="themed_input"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- This field is for Income only -->
+    <EditText
+        android:id="@+id/etEditSource"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Source (e.g., Salary, Gift)"
+        android:tag="themed_input"
+        android:visibility="gone"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- This field is for Expenses only -->
+    <Spinner
+        android:id="@+id/spinnerEditCategory"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnEditDatePicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select Date"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:id="@+id/etEditNotes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Optional notes..."
+        android:inputType="textMultiLine"
+        android:minLines="3"
+        android:gravity="top"
+        android:tag="themed_input"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnSaveChanges"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save Changes"
+        android:tag="themed_accent"/>
+</LinearLayout>

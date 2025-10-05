@@ -4,12 +4,18 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.st10321779.rootedwealth.MainActivity
 import com.st10321779.rootedwealth.databinding.ActivitySettingsBinding
 import com.st10321779.rootedwealth.theme.ThemeManager
 import com.st10321779.rootedwealth.theme.ThemeRepository
 import com.st10321779.rootedwealth.util.PrefsManager
+import com.st10321779.rootedwealth.viewmodels.HomeViewModel
+import androidx.lifecycle.lifecycleScope
+import com.st10321779.rootedwealth.gamification.GamificationEngine
+import com.st10321779.rootedwealth.ui.categories.CategoryManagerActivity
+import kotlinx.coroutines.launch
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
@@ -23,9 +29,20 @@ class SettingsActivity : AppCompatActivity() {
         setupThemeSpinner()
         loadCurrentSettings()
 
+        binding.btnManageCategories.setOnClickListener {
+            startActivity(Intent(this, CategoryManagerActivity::class.java))
+        }
+
         binding.btnAddCoins.setOnClickListener {
             PrefsManager.addCoins(this, 500)
             Toast.makeText(this, "Added 500 coins!", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.btnRunEndOfMonth.setOnClickListener {
+            // Launch a coroutine to call the suspend function
+            lifecycleScope.launch {
+                GamificationEngine.processEndOfMonth(this@SettingsActivity)
+            }
         }
 
         binding.btnSaveSettings.setOnClickListener {
@@ -75,7 +92,11 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         // Bank Link
-        PrefsManager.setBankLinked(this, binding.switchLinkBank.isChecked)
+        val isBankLinked = binding.switchLinkBank.isChecked
+        PrefsManager.setBankLinked(this, isBankLinked)
+        // Notify the ViewModel to run the seeder if needed
+        val homeViewModel: HomeViewModel by viewModels() // You might need to add this
+        homeViewModel.onBankLinkStatusChanged(isBankLinked)
 
         Toast.makeText(this, "Settings Saved! Applying changes...", Toast.LENGTH_SHORT).show()
 

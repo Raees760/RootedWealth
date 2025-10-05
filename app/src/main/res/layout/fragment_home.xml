@@ -30,6 +30,17 @@
                 android:tag="themed_panel">
 
                 <TextView
+                    android:id="@+id/tvBankLinkBanner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="✓ Bank Account Linked"
+                    android:gravity="center"
+                    android:background="@color/budget_green"
+                    android:textColor="@android:color/white"
+                    android:visibility="gone"
+                    android:padding="4dp"/>
+
+                <TextView
                     android:id="@+id/tvGreeting"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

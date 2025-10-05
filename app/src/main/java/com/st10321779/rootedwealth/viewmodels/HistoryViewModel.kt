@@ -126,4 +126,11 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
 
         _alignmentTrackerData.postValue(AlignmentTrackerInfo(finalLabel, finalInsight))
     }
+
+    fun deleteHistoryItem(item: HistoryItem) = viewModelScope.launch {
+        when (item) {
+            is HistoryItem.ExpenseItem -> db.expenseDao().deleteExpenseById(item.expense.id)
+            is HistoryItem.IncomeItem -> db.incomeDao().deleteIncomeById(item.income.id)
+        }
+    }
 }

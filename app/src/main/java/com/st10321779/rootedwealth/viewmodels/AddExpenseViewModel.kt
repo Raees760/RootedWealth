@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.st10321779.rootedwealth.data.local.AppDatabase
 import com.st10321779.rootedwealth.data.local.entity.Category
 import com.st10321779.rootedwealth.data.local.entity.Expense
+import com.st10321779.rootedwealth.gamification.GamificationEngine
 import com.st10321779.rootedwealth.repository.ExpenseRepository
 import kotlinx.coroutines.launch
 
@@ -22,5 +23,7 @@ class AddExpenseViewModel(application: Application) : AndroidViewModel(applicati
 
     fun addExpense(expense: Expense) = viewModelScope.launch {
         expenseRepository.addExpense(expense)
+        // After saving, process gamification
+        GamificationEngine.processNewEntry(getApplication())
     }
 }

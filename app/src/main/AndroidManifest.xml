@@ -23,6 +23,8 @@
         <activity android:name=".settings.SettingsActivity" />
         <activity android:name=".ui.rewards.RewardsActivity" />
         <activity android:name=".add.AddIncomeActivity" />
+        <activity android:name=".ui.edit.EditActivity" android:label="Edit Transaction" />
+        <activity android:name=".ui.categories.CategoryManagerActivity" android:label="Manage Categories" />
         <activity
             android:name=".ui.tutorial.TutorialActivity"
             android:label="Tutorial"

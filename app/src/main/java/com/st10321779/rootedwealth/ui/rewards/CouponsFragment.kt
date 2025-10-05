@@ -40,7 +40,7 @@ class CouponsFragment : Fragment() {
     private fun showQrCodeDialog(coupon: Coupon) {
         AlertDialog.Builder(requireContext())
             .setTitle("${coupon.brandName} Coupon")
-            .setMessage("Coupon purchased! \n\n'${coupon.description}'\n\n(This would show a QR code for content: ${coupon.qrCodeContent})")
+            .setMessage("Coupon purchased! \n\n'${coupon.description}'\n\n(${coupon.qrCodeContent})")
             .setPositiveButton("OK", null)
             .show()
     }

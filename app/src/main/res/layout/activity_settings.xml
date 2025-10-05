@@ -50,6 +50,13 @@
             android:inputType="numberDecimal"/>
     </com.google.android.material.textfield.TextInputLayout>
 
+    <Button
+        android:id="@+id/btnManageCategories"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Manage Categories"
+        android:layout_marginTop="24dp"/>
+
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/switchLinkBank"
         android:layout_width="match_parent"
@@ -69,6 +76,12 @@
         android:layout_height="wrap_content"
         android:text="+500 Coins (Dev)"
         android:layout_gravity="center_horizontal"/>
+    <Button
+        android:id="@+id/btnRunEndOfMonth"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Run End-of-Month Check (Dev)"
+        android:layout_marginTop="16dp"/>
 
     <Button
         android:id="@+id/btnSaveSettings"

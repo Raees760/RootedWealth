@@ -1,6 +1,7 @@
 package com.st10321779.rootedwealth.ui.history
 
 import android.graphics.Color
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +17,11 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class HistoryAdapter : ListAdapter<HistoryItem, RecyclerView.ViewHolder>(HistoryDiffCallback()) {
+
+class HistoryAdapter(
+    private val onEditClick: (HistoryItem) -> Unit,
+    private val onDeleteClick: (HistoryItem) -> Unit
+) : ListAdapter<HistoryItem, RecyclerView.ViewHolder>(HistoryDiffCallback()) {
 
     private var expandedPosition = -1
     private val currencyFormat = NumberFormat.getCurrencyInstance(Locale("en", "ZA"))
@@ -48,13 +53,15 @@ class HistoryAdapter : ListAdapter<HistoryItem, RecyclerView.ViewHolder>(History
                 binding.viewCategoryColor.setBackgroundColor(Color.GRAY)
             }
 
-            // Handle visibility of the entire expanded group
             binding.groupExpandedDetails.visibility = if (isExpanded) View.VISIBLE else View.GONE
             binding.tvFullNotes.text = expense.notes ?: "No notes provided."
+            val isLinked = expense.isLinked
+            binding.btnEdit.isEnabled = !isLinked
+            binding.btnDelete.isEnabled = !isLinked
+
             if (isExpanded && !expense.imageUri.isNullOrBlank()) {
                 try {
-                    // This will now work correctly because the URI is a content:// URI
-                    binding.ivExpenseImage.setImageURI(android.net.Uri.parse(expense.imageUri))
+                    binding.ivExpenseImage.setImageURI(Uri.parse(expense.imageUri))
                     binding.ivExpenseImage.visibility = View.VISIBLE
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -64,14 +71,12 @@ class HistoryAdapter : ListAdapter<HistoryItem, RecyclerView.ViewHolder>(History
                 binding.ivExpenseImage.visibility = View.GONE
             }
 
-            val isLinked = expense.isLinked
-            binding.btnEdit.isEnabled = !isLinked
-            binding.btnDelete.isEnabled = !isLinked
+            binding.btnEdit.setOnClickListener { onEditClick(item) }
+            binding.btnDelete.setOnClickListener { onDeleteClick(item) }
 
             itemView.setOnClickListener {
                 val previousExpandedPosition = expandedPosition
                 expandedPosition = if (isExpanded) -1 else adapterPosition
-                // We need to notify both the old and new positions to handle collapse/expand correctly
                 if (previousExpandedPosition != -1) {
                     notifyItemChanged(previousExpandedPosition)
                 }
@@ -84,9 +89,27 @@ class HistoryAdapter : ListAdapter<HistoryItem, RecyclerView.ViewHolder>(History
     inner class IncomeViewHolder(private val binding: ItemHistoryIncomeBinding) : BaseViewHolder<HistoryItem.IncomeItem>(binding) {
         override fun bind(item: HistoryItem.IncomeItem) {
             val income = item.income
+            val isExpanded = adapterPosition == expandedPosition
+
             binding.tvIncomeSource.text = income.source
             binding.tvIncomeAmount.text = "+ ${currencyFormat.format(income.amount)}"
             binding.tvIncomeDate.text = dateFormat.format(income.date)
+
+            binding.groupIncomeExpandedDetails.visibility = if (isExpanded) View.VISIBLE else View.GONE
+            binding.tvIncomeFullNotes.text = income.notes ?: "No notes provided."
+            val isLinked = income.isLinked
+            binding.btnIncomeEdit.isEnabled = !isLinked
+            binding.btnIncomeDelete.isEnabled = !isLinked
+
+            binding.btnIncomeEdit.setOnClickListener { onEditClick(item) }
+            binding.btnIncomeDelete.setOnClickListener { onDeleteClick(item) }
+
+            itemView.setOnClickListener {
+                val previousExpandedPosition = expandedPosition
+                expandedPosition = if (isExpanded) -1 else adapterPosition
+                if (previousExpandedPosition != -1) notifyItemChanged(previousExpandedPosition)
+                notifyItemChanged(expandedPosition)
+            }
         }
     }
 

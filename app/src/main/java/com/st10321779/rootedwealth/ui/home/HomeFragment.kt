@@ -56,11 +56,17 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeViewModel() {
+        var currentSpent = 0.0
+        var currentBudget = 0.0f
         homeViewModel.totalSpentThisMonth.observe(viewLifecycleOwner) { spent ->
-            homeViewModel.monthlyBudget.observe(viewLifecycleOwner) { budget ->
-                updateBudgetSummary(spent ?: 0.0, budget)
-            }
+            currentSpent = spent ?: 0.0
+            updateBudgetSummary(currentSpent, currentBudget.toDouble())
         }
+        homeViewModel.monthlyBudget.observe(viewLifecycleOwner) { budget ->
+            currentBudget = budget
+            updateBudgetSummary(currentSpent, currentBudget.toDouble())
+        }
+
         // Placeholder data for pie chart
         //updatePieChart(listOf(PieEntry(450f, "Groceries"), PieEntry(200f, "Transport"), PieEntry(800f, "Takeout")))
 
@@ -77,10 +83,15 @@ class HomeFragment : Fragment() {
             totalIncome = income ?: 0.0
             updatePieChartCenterText(totalSpent, totalIncome)
         }
-
         homeViewModel.spendingByCategory.observe(viewLifecycleOwner) { spendingList ->
             val entries = spendingList.map { PieEntry(it.total.toFloat(), it.categoryName) }
             updatePieChart(entries)
+        }
+        //Observe gamification data
+        homeViewModel.uiState.observe(viewLifecycleOwner) { state ->
+            binding.tvStreak.text = "🔥 Streak: ${state.streakCount} Days"
+            binding.tvCoins.text = "💰 Coins: ${state.coinBalance}"
+            binding.tvBankLinkBanner.visibility = if (state.isBankLinked) View.VISIBLE else View.GONE
         }
     }
 

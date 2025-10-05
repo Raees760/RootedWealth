@@ -1,10 +1,13 @@
 package com.st10321779.rootedwealth.ui.history
 
+import android.app.AlertDialog
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -13,8 +16,10 @@ import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.st10321779.rootedwealth.R
 import com.st10321779.rootedwealth.data.local.dao.CategorySpending
+import com.st10321779.rootedwealth.data.model.HistoryItem
 import com.st10321779.rootedwealth.databinding.FragmentHistoryBinding
 import com.st10321779.rootedwealth.theme.ThemeManager
+import com.st10321779.rootedwealth.ui.edit.EditActivity
 import com.st10321779.rootedwealth.viewmodels.FilterPeriod
 import com.st10321779.rootedwealth.viewmodels.HistoryViewModel
 
@@ -41,8 +46,38 @@ class HistoryFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        historyAdapter = HistoryAdapter()
+        historyAdapter = HistoryAdapter(
+            onEditClick = { item ->
+                // The new navigation logic
+                val intent = Intent(requireContext(), EditActivity::class.java)
+                when (item) {
+                    is HistoryItem.ExpenseItem -> {
+                        intent.putExtra(EditActivity.EXTRA_ITEM_ID, item.expense.id)
+                        intent.putExtra(EditActivity.EXTRA_IS_EXPENSE, true)
+                    }
+                    is HistoryItem.IncomeItem -> {
+                        intent.putExtra(EditActivity.EXTRA_ITEM_ID, item.income.id)
+                        intent.putExtra(EditActivity.EXTRA_IS_EXPENSE, false)
+                    }
+                }
+                startActivity(intent)
+            },
+            onDeleteClick = { item ->
+                showDeleteConfirmationDialog(item)
+            }
+        )
         binding.rvHistory.adapter = historyAdapter
+    }
+    private fun showDeleteConfirmationDialog(item: HistoryItem) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Delete Transaction")
+            .setMessage("Are you sure you want to delete this entry?")
+            .setPositiveButton("Delete") { _, _ ->
+                viewModel.deleteHistoryItem(item)
+                Toast.makeText(requireContext(), "Entry deleted.", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun setupFilterChips() {
