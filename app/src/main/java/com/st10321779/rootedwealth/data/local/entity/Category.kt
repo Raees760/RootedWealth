@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey
 data class Category(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
-    val icon: String, // Placeholder for icon resource name
-    val color: String, // Hex color string e.g., #FF5733
+    val icon: String, // placeholder for icon resource name
+    val color: String, //hex color string e.g., #FF5733
     val isDefault: Boolean,
     var isActive: Boolean = true
 )

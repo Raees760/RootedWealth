@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.st10321779.rootedwealth.add.AddExpenseActivity
+import com.google.firebase.auth.FirebaseAuth
 import com.st10321779.rootedwealth.databinding.ActivityMainBinding
 import com.st10321779.rootedwealth.settings.SettingsActivity
 import com.st10321779.rootedwealth.theme.ThemeManager
@@ -15,27 +16,39 @@ import com.st10321779.rootedwealth.ui.tutorial.TutorialActivity
 
 class MainActivity : AppCompatActivity() {
 
-    // Declare the binding variable
+    //declare the binding variable
     private lateinit var binding: ActivityMainBinding
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Firstt make sure user is logged in
+        auth = FirebaseAuth.getInstance()
+        if (auth.currentUser == null) {
+            // if no user is logged in, go to the Login screen and finish this activity
+            val intent = Intent(this, Login::class.java)
+            startActivity(intent)
+            finish()
+            return //stop the rest of the onCreate method from running
+        }
+
         // Inflate the layout using the binding class
         binding = ActivityMainBinding.inflate(layoutInflater)
-        // Set the content view to the root of the binding
+        // set the content view to the root of the binding
         setContentView(binding.root)
 
-        // Set initial fragment
+        // set initial fragment
         if (savedInstanceState == null) {
             loadFragment(HomeFragment())
         }
 
-        // Access views through the binding object
+        // access views throughthe  binding object
         binding.navView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_home -> {
                     loadFragment(HomeFragment())
-                    true
+                    true //true because we stay here
                 }
                 R.id.navigation_history -> {
                     loadFragment(HistoryFragment())
@@ -43,13 +56,13 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.navigation_tutorial -> {
                     startActivity(Intent(this, TutorialActivity::class.java))
-                    false // Return false so the navigation item doesn't stay selected
+                    false // return false so the navigation item doesnt stay selected
                 }
                 R.id.navigation_rewards -> {
                     startActivity(Intent(this, RewardsActivity::class.java))
-                    // Return false so the item doesn't stay selected.
-                    // This is because we are navigating away to a new Activity.
-                    // To keep it selected, might need to manage state, but false is simpler.
+                    // return false so the item doesnt stay selected.
+                    // This is since we are navigating away to a new Activity.
+                    // To keep it selected, might need to manage state, but false is easier...
                     false
                 }
                 R.id.navigation_settings -> {
@@ -63,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         // This is important for the cradle effect of the BottomAppBar
         binding.navView.background = null
 
-        // Set the click listener for the Floating Action Button
+        //set the click listener for the Floating Action Button
         binding.fabAddExpense.setOnClickListener {
             startActivity(Intent(this, AddExpenseActivity::class.java))
         }

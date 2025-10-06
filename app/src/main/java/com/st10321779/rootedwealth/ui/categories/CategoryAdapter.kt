@@ -25,12 +25,12 @@ class CategoryAdapter(
             }
 
             if (category.isDefault) {
-                // Default category: non-editable/deletable
+                //Default category: non-editable/deletable
                 binding.btnCategoryDelete.visibility = View.GONE
                 binding.ivDefaultIcon.visibility = View.VISIBLE
                 itemView.setOnClickListener(null) // Not clickable
             } else {
-                // Custom category: editable/deletable
+                //Custom category: editable/deletable
                 binding.btnCategoryDelete.visibility = View.VISIBLE
                 binding.ivDefaultIcon.visibility = View.GONE
                 binding.btnCategoryDelete.setOnClickListener { onDeleteClick(category) }

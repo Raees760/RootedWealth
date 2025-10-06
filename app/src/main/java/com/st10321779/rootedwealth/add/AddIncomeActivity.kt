@@ -28,7 +28,23 @@ class AddIncomeActivity : AppCompatActivity() {
         binding.btnSaveIncome.setOnClickListener { saveIncome() }
     }
 
-    private fun setupDatePicker() { /* ... same as in AddExpenseActivity ... */ }
+
+    private fun setupDatePicker() {
+        binding.btnIncomeDatePicker.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+                val selectedCalendar = Calendar.getInstance()
+                selectedCalendar.set(selectedYear, selectedMonth, selectedDay)
+                selectedDate = selectedCalendar.time
+                binding.btnIncomeDatePicker.text = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+            }, year, month, day)
+            datePickerDialog.show()
+        }
+    }
 
     private fun saveIncome() {
         val amountStr = binding.etIncomeAmount.text.toString()

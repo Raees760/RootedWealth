@@ -25,9 +25,9 @@ object PrefsManager {
     fun getMonthlyBudget(context: Context): Float = prefs(context).getFloat(KEY_MONTHLY_BUDGET, 20000.0f)
 
     fun getMonthlyBudgetLiveData(context: Context): LiveData<Float> {
-        // This LiveData wrapper will emit a new value whenever the underlying preference changes.
+        // this LiveData wrapper will emit a new value whenever the underlying preference changes.
         return object : LiveData<Float>() {
-            // The listener that reacts to preference changes.
+            //the listener that reacts to preference changes.
             private val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
                 if (key == KEY_MONTHLY_BUDGET) {
                     // When the budget key changes, update the LiveData's value.
@@ -35,16 +35,16 @@ object PrefsManager {
                 }
             }
 
-            // This is called when the LiveData becomes active (i.e., has an observer).
+            // this is called when the LiveData becomes active (i.e., has an observer).
             override fun onActive() {
                 super.onActive()
-                // Emit the current value immediately.
+                // Eemit the current value immediately.
                 value = getMonthlyBudget(context)
-                // Register the listener to watch for future changes.
+                // register the listener to watch for future changes.
                 prefs(context).registerOnSharedPreferenceChangeListener(listener)
             }
 
-            // This is called when the LiveData becomes inactive.
+            //this is called when the LiveData becomes inactive.
             override fun onInactive() {
                 super.onInactive()
                 // Unregister the listener to prevent memory leaks.
@@ -53,7 +53,7 @@ object PrefsManager {
         }
     }
 
-    // Bank Link
+    // Bank-Link
     fun setBankLinked(context: Context, isLinked: Boolean) {
         prefs(context).edit().putBoolean(KEY_BANK_LINKED, isLinked).apply()
     }

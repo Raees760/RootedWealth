@@ -32,7 +32,7 @@ class HistoryAdapter(
         private const val TYPE_INCOME = 1
     }
 
-    // A generic ViewHolder that our specific holders will extend
+    // A generic ViewHolder that our holders will extend
     abstract class BaseViewHolder<T>(binding: ViewBinding) : RecyclerView.ViewHolder(binding.root) {
         abstract fun bind(item: T)
     }

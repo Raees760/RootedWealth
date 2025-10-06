@@ -52,18 +52,18 @@ interface ExpenseDao {
     @Query("SELECT * FROM expenses WHERE id = :expenseId LIMIT 1")
     suspend fun getExpenseById(expenseId: Long): Expense?
 
-    // For Analytics
+    //Analytics
     @Query("SELECT COUNT(DISTINCT STRFTIME('%Y-%m-%d', date / 1000, 'unixepoch')) FROM expenses WHERE date BETWEEN :startDate AND :endDate")
     suspend fun getDistinctLogDaysCount(startDate: Date, endDate: Date): Int
 
     @Query("SELECT IFNULL(SUM(amount), 0) FROM expenses WHERE date BETWEEN :startDate AND :endDate")
     suspend fun getTotalExpensesInPeriodAsync(startDate: Date, endDate: Date): Double
 
-    //For Gamification
+    //Gamification
     @Query("SELECT COUNT(id) FROM expenses")
     suspend fun getExpenseCount(): Int
 
-    // Gets total spending for a specific category in a date range.
+    // gets total spending for a specific category in a date range.
     // Needed for challenges like "Spend under R500 on Takeout".
     @Query("""
     SELECT SUM(e.amount) 
@@ -73,7 +73,7 @@ interface ExpenseDao {
     """)
     suspend fun getTotalSpentForCategory(categoryName: String, startDate: Date, endDate: Date): Double?
 
-    // Gets total spending for a list of categories (e.g., "luxuries").
+    // gets total spending for a list of categories (eg: "luxuries").
     @Query("""
     SELECT SUM(e.amount)
     FROM expenses e

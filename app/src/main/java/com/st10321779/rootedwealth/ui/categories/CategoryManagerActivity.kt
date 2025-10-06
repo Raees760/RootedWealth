@@ -57,11 +57,11 @@ class CategoryManagerActivity : AppCompatActivity() {
     private fun showAddEditDialog(category: Category?) {
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_edit_category, null)
         val etName = dialogView.findViewById<EditText>(R.id.etCategoryName)
-        // Get references to the new views
+        //get references to the new views
         val btnChooseColor = dialogView.findViewById<android.widget.Button>(R.id.btnChooseColor)
         val viewColorPreview = dialogView.findViewById<View>(R.id.viewColorPreview)
 
-        // Variable to hold the selected color integer
+        // variabvle to hold the selected color integer
         var selectedColor = Color.parseColor("#FF5733") // Default color
 
         val title = if (category == null) "Add Category" else "Edit Category"
@@ -73,10 +73,10 @@ class CategoryManagerActivity : AppCompatActivity() {
             } catch (e: Exception) { /* Keep default if parse fails */ }
         }
 
-        // Set the initial preview color
+        //set the initial preview color
         viewColorPreview.setBackgroundColor(selectedColor)
 
-        // Set the click listener for the button
+        //set the click listener for the button
         btnChooseColor.setOnClickListener {
             ColorPickerDialogBuilder
                 .with(this)
@@ -98,7 +98,7 @@ class CategoryManagerActivity : AppCompatActivity() {
             .setView(dialogView)
             .setPositiveButton("Save") { _, _ ->
                 val name = etName.text.toString().trim()
-                // Convert the selected integer color back to a hex string for storage
+                //convert the selected integer color back to a hex string for storage
                 val colorHex = String.format("#%06X", 0xFFFFFF and selectedColor)
 
                 if (name.isBlank()) {
@@ -106,9 +106,9 @@ class CategoryManagerActivity : AppCompatActivity() {
                     return@setPositiveButton
                 }
 
-                if (category == null) { // Adding new
+                if (category == null) { // adding new
                     viewModel.addCategory(Category(name = name, color = colorHex, icon = "", isDefault = false))
-                } else { // Editing existing
+                } else { // editing existing
                     viewModel.updateCategory(category.copy(name = name, color = colorHex))
                 }
             }

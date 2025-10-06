@@ -11,5 +11,5 @@ data class AppTheme(
     @ColorRes val textColorRes: Int,
     @DrawableRes val panelDrawableRes: Int?, // if null use plain color
     val panelUsesImage: Boolean = false,
-    val darkOverlayAlpha: Float = 0f // 0..1 overlay black alpha applied in dark mode
+    val darkOverlayAlpha: Float = 0f // 0-1 overlay black alpha applied in dark mode
 )

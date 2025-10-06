@@ -22,14 +22,14 @@ class CategoryViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun deleteCategory(category: Category) = viewModelScope.launch {
-        // Check if the category is in use
+        // check if the category is in use
         val expenseCount = categoryDao.getExpenseCountForCategory(category.id)
         if (expenseCount > 0) {
-            // Soft delete: Mark as inactive
+            // soft delete i.e. mark as inactive
             val updatedCategory = category.copy(isActive = false)
             categoryDao.update(updatedCategory)
         } else {
-            // Hard delete: Remove from database
+            // hard delete - Remove from database
             categoryDao.deleteById(category.id)
         }
     }

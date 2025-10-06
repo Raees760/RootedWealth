@@ -11,11 +11,11 @@ data class Expense(
     val date: Date,
     val categoryId: Long,
     val notes: String?,
-    val imageUri: String?, // Store URI of the image
-    val isLinked: Boolean = false // For simulated bank entries
+    val imageUri: String?, // store URI of the image
+    val isLinked: Boolean = false //for  bank entries
 )
 data class ExpenseWithCategory(
-    // We don't need @Embedded here since we are selecting columns individually
+    // don't need @Embedded here since we are selecting columns individually
     val id: Long,
     val amount: Double,
     val date: Date,

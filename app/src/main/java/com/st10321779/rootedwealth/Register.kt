@@ -83,7 +83,6 @@ class Register : AppCompatActivity() {
                         ).show()
                     }
                 }
-
         }
     }
 }

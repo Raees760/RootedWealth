@@ -90,5 +90,14 @@
         android:text="Save &amp; Apply"
         android:layout_marginTop="16dp"
         android:tag="themed_accent"/>
+    <Button
+        android:id="@+id/btnLogout"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="24dp"
+        android:text="Logout"
+        android:textColor="@android:color/holo_red_dark" />
 
 </LinearLayout>

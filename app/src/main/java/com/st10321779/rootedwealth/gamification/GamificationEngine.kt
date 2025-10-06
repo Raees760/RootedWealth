@@ -15,17 +15,17 @@ import kotlin.math.max
 
 object GamificationEngine {
 
-    /**
-     * Call this every time a new expense is added.
-     */
+    /*
+     Call this every time a new expense is added.
+    */
     suspend fun processNewEntry(context: Context) {
         checkAndAwardFirstExpenseAchievement(context)
         updateStreak(context)
         checkWeeklyChallenges(context) // Check challenges on every new entry
     }
 
-    /**
-     * Call this manually (e.g., from a button) to simulate end-of-month calculations.
+    /*
+      Call this manually (e.g., from a button) to simulate end-of-month calculations.
      */
     suspend fun processEndOfMonth(context: Context) {
         checkUnderBudgetAchievements(context)
@@ -36,7 +36,7 @@ object GamificationEngine {
     }
 
 
-    // --- ACHIEVEMENT & STREAK LOGIC ---
+    // ACHIEVEMENT & STREAK LOGIC
     private suspend fun checkAndAwardFirstExpenseAchievement(context: Context) {
         val db = AppDatabase.getDatabase(context)
         val count = db.expenseDao().getExpenseCount()
@@ -61,7 +61,7 @@ object GamificationEngine {
         val streak = if (isConsecutiveDay(lastLogCal, currentCal)) {
             PrefsManager.getStreakCount(context) + 1
         } else {
-            1 // Streak broken, reset
+            1 // streak broken, reset
         }
 
         PrefsManager.saveStreakCount(context, streak)
@@ -90,10 +90,10 @@ object GamificationEngine {
     }
 
 
-    // --- CHALLENGE & REWARD LOGIC ---
+    // CHALLENGE & REWARD LOGIC
 
     private suspend fun checkWeeklyChallenges(context: Context) {
-        // Only run if a bank account is linked
+        // only run if a bank account is linked
         if (!PrefsManager.isBankLinked(context)) return
 
         val end = Calendar.getInstance().time
@@ -102,14 +102,14 @@ object GamificationEngine {
         val start = startCal.time
         val db = AppDatabase.getDatabase(context)
 
-        // Challenge: "Home Meals Are Best"
+        // challenge: "Home Meals Are Best"
         val takeawaySpend = db.expenseDao().getTotalSpentForCategory("Takeout", start, end) ?: 0.0
         if (takeawaySpend < 500 && !PrefsManager.hasAchievement(context, "weekly_takeout_challenge")) {
             awardAchievement(context, "weekly_takeout_challenge", 75, "Challenge Complete: Home Meals Are Best!")
         }
 
-        // Challenge: "The Simple Life" (luxuries)
-        val luxuryCategories = listOf("Entertainment", "Takeout") // Define what counts as luxury
+        // challenge: "The Simple Life" (luxuries)
+        val luxuryCategories = listOf("Entertainment", "Takeout") // define what counts as luxury
         val luxurySpend = db.expenseDao().getTotalSpentForCategoryList(luxuryCategories, start, end) ?: 0.0
         if (luxurySpend < 1500 && !PrefsManager.hasAchievement(context, "weekly_luxury_challenge")) {
             awardAchievement(context, "weekly_luxury_challenge", 75, "Challenge Complete: The Simple Life!")
@@ -122,7 +122,7 @@ object GamificationEngine {
         val db = AppDatabase.getDatabase(context)
         val end = Calendar.getInstance().time
         val startCal = Calendar.getInstance()
-        startCal.add(Calendar.MONTH, -1) // Check last month's data
+        startCal.add(Calendar.MONTH, -1) //check last month's data
         val start = startCal.time
 
         val totalBudget = PrefsManager.getMonthlyBudget(context)
@@ -130,12 +130,11 @@ object GamificationEngine {
 
         if (totalSpent < totalBudget && !PrefsManager.hasAchievement(context, "under_budget_1")) {
             awardAchievement(context, "under_budget_1", 100, "Achievement: Under Budget!")
-            // In a real app, you'd track tiers (1, 3, 6 months) in PrefsManager
         }
     }
 
 
-    // --- HELPER FUNCTIONS ---
+    // HELPER FUNCTIONS
 
     private fun awardAchievement(context: Context, id: String, coins: Int, message: String) {
         PrefsManager.addCoins(context, coins)
@@ -152,7 +151,7 @@ object GamificationEngine {
     }
 
     private fun isConsecutiveDay(cal1: Calendar, cal2: Calendar): Boolean {
-        // To correctly handle year boundaries, we check if cal1 is exactly one day before cal2
+        // to correctly handle year boundaries, we check if cal1 is exactly one day before cal2
         val nextDayOfCal1 = cal1.clone() as Calendar
         nextDayOfCal1.add(Calendar.DAY_OF_YEAR, 1)
         return isSameDay(nextDayOfCal1, cal2)

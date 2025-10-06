@@ -76,7 +76,7 @@ class HomeFragment : Fragment() {
         homeViewModel.totalSpentThisMonth.observe(viewLifecycleOwner) { spent ->
             totalSpent = spent ?: 0.0
             updatePieChartCenterText(totalSpent, totalIncome)
-            // ... update budget summary
+            // update budget summary
         }
 
         homeViewModel.totalIncomeThisMonth.observe(viewLifecycleOwner) { income ->
@@ -87,8 +87,9 @@ class HomeFragment : Fragment() {
             val entries = spendingList.map { PieEntry(it.total.toFloat(), it.categoryName) }
             updatePieChart(entries)
         }
-        //Observe gamification data
+        //observe gamification data
         homeViewModel.uiState.observe(viewLifecycleOwner) { state ->
+            binding.tvGreeting.text = "Hello, ${state.userName}!"
             binding.tvStreak.text = "🔥 Streak: ${state.streakCount} Days"
             binding.tvCoins.text = "💰 Coins: ${state.coinBalance}"
             binding.tvBankLinkBanner.visibility = if (state.isBankLinked) View.VISIBLE else View.GONE
@@ -144,7 +145,7 @@ class HomeFragment : Fragment() {
         val data = PieData(dataSet)
         data.setValueTextSize(12f)
 
-        // Set text color based on the current theme
+        //set text color based on the current theme
         val theme = ThemeManager.getSelectedTheme(requireContext())
         val textColor = ContextCompat.getColor(requireContext(), theme.textColorRes)
         binding.pieChart.setEntryLabelColor(textColor)
@@ -156,7 +157,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // Re-apply theme in case it was changed in Settings
+        //re-apply theme in case it was changed in Settings
         ThemeManager.applyTheme(requireContext(), ThemeManager.getSelectedTheme(requireContext()), binding.root)
     }
 

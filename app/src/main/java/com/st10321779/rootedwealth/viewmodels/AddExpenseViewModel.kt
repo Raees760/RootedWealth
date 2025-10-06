@@ -23,7 +23,7 @@ class AddExpenseViewModel(application: Application) : AndroidViewModel(applicati
 
     fun addExpense(expense: Expense) = viewModelScope.launch {
         expenseRepository.addExpense(expense)
-        // After saving, process gamification
+        // After saving, process gamification, still wip
         GamificationEngine.processNewEntry(getApplication())
     }
 }

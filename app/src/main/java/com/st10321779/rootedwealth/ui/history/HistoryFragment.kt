@@ -48,7 +48,7 @@ class HistoryFragment : Fragment() {
     private fun setupRecyclerView() {
         historyAdapter = HistoryAdapter(
             onEditClick = { item ->
-                // The new navigation logic
+                // the new navigation logic
                 val intent = Intent(requireContext(), EditActivity::class.java)
                 when (item) {
                     is HistoryItem.ExpenseItem -> {
@@ -112,7 +112,7 @@ class HistoryFragment : Fragment() {
         viewModel.spendingByCategory.observe(viewLifecycleOwner) { spendingList ->
             drawPieChart(spendingList)
             drawBarChart(spendingList)
-            drawLineChart(spendingList) // Note: Uses same data for now
+            drawLineChart(spendingList) // TO DO: use different data
         }
 
         viewModel.alignmentTrackerData.observe(viewLifecycleOwner) { info ->

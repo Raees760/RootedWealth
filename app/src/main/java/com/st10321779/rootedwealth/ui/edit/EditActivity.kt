@@ -129,6 +129,29 @@ class EditActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun setupCategorySpinner() { /* ... same as in AddExpenseActivity ... */ }
-    private fun showDatePicker() { /* ... same as in AddExpenseActivity ... */ }
+    private fun setupCategorySpinner() {
+        viewModel.allCategories.observe(this) { categoryList ->
+            categories = categoryList
+            val categoryNames = categoryList.map { it.name }
+            val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categoryNames)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.spinnerEditCategory.adapter = adapter
+        }
+    }
+    private fun showDatePicker() {
+        binding.btnEditDatePicker.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val datePickerDialog = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+                val selectedCalendar = Calendar.getInstance()
+                selectedCalendar.set(selectedYear, selectedMonth, selectedDay)
+                selectedDate = selectedCalendar.time
+                binding.btnEditDatePicker.text = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+            }, year, month, day)
+            datePickerDialog.show()
+        }
+    }
 }

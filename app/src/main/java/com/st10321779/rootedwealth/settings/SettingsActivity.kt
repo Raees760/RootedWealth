@@ -16,6 +16,8 @@ import androidx.lifecycle.lifecycleScope
 import com.st10321779.rootedwealth.gamification.GamificationEngine
 import com.st10321779.rootedwealth.ui.categories.CategoryManagerActivity
 import kotlinx.coroutines.launch
+import com.google.firebase.auth.FirebaseAuth
+import com.st10321779.rootedwealth.Login
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
@@ -39,7 +41,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.btnRunEndOfMonth.setOnClickListener {
-            // Launch a coroutine to call the suspend function
+            // launch a coroutine to call the suspend function
             lifecycleScope.launch {
                 GamificationEngine.processEndOfMonth(this@SettingsActivity)
             }
@@ -49,10 +51,22 @@ class SettingsActivity : AppCompatActivity() {
             saveAndApplySettings()
         }
 
-        // Apply dark mode instantly for better UX
+        //apply dark mode instantly for better UX
         binding.switchDark.setOnCheckedChangeListener { _, isChecked ->
             ThemeManager.saveDarkMode(this, isChecked)
             ThemeManager.applyTheme(this, ThemeManager.getSelectedTheme(this), binding.root)
+        }
+        // logout Listener
+        binding.btnLogout.setOnClickListener {
+            //sign out from Firebase
+            FirebaseAuth.getInstance().signOut()
+
+            //go to the login screen
+            val intent = Intent(this, Login::class.java)
+            // =these flags clear the entire task stack, so the user can't press "back" to get into the app again
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(intent)
+            finish() //close the settings activity
         }
     }
 
@@ -64,43 +78,43 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun loadCurrentSettings() {
-        // Theme
+        //Theme
         val themes = ThemeRepository.all
         val selectedTheme = ThemeManager.getSelectedTheme(this)
         binding.spinnerThemes.setSelection(themes.indexOfFirst { it.id == selectedTheme.id })
 
-        // Dark Mode
+        //Dark Mode
         binding.switchDark.isChecked = ThemeManager.isDarkMode(this)
 
-        // Budget
+        //Budget
         binding.etMonthlyBudget.setText(PrefsManager.getMonthlyBudget(this).toString())
 
-        // Bank Link
+        //Bank Link
         binding.switchLinkBank.isChecked = PrefsManager.isBankLinked(this)
     }
 
     private fun saveAndApplySettings() {
-        // Theme
+        //Theme
         val themes = ThemeRepository.all
         val selectedTheme = themes[binding.spinnerThemes.selectedItemPosition]
         ThemeManager.saveSelectedTheme(this, selectedTheme.id)
 
-        // Budget
+        //Budget
         val budget = binding.etMonthlyBudget.text.toString().toFloatOrNull() ?: 0.0f
         if (budget > 0) {
             PrefsManager.saveMonthlyBudget(this, budget)
         }
 
-        // Bank Link
+        //Bank Link
         val isBankLinked = binding.switchLinkBank.isChecked
         PrefsManager.setBankLinked(this, isBankLinked)
-        // Notify the ViewModel to run the seeder if needed
-        val homeViewModel: HomeViewModel by viewModels() // You might need to add this
+        //notify the ViewModel to run the seeder if needed
+        val homeViewModel: HomeViewModel by viewModels()
         homeViewModel.onBankLinkStatusChanged(isBankLinked)
 
         Toast.makeText(this, "Settings Saved! Applying changes...", Toast.LENGTH_SHORT).show()
 
-        // Force a full restart to apply theme correctly
+        // force a full restart to apply theme correctly
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)

@@ -87,25 +87,25 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
         startCal.add(Calendar.DAY_OF_MONTH, -30)
         val start = startCal.time
 
-        // Get raw data from DB
+        //get raw data from DB
         val totalIncome = incomeDao.getTotalIncomeInPeriodAsync(start, end)
         val totalExpenses = expenseDao.getTotalExpensesInPeriodAsync(start, end)
         val distinctLogDays = expenseDao.getDistinctLogDaysCount(start, end)
 
-        // Calculate Metrics
-        // Adherence (0.0 to 1.0) (How disciplined in recording entries)
+        // calculate Metrics
+        // Adherence (0 to 1) (How discplined in recording entries)
         val adherenceScore = min(distinctLogDays / 30.0, 1.0)
 
-        // Spending Behaviour (0.0 to 1.0, where 1.0 is a good saver)
+        // Spending Behaviour (0 to 1, where 1 is a good saver)
         val savingsRate = if (totalIncome > 0) (totalIncome - totalExpenses) / totalIncome else 0.0
-        val behaviorScore = when { // Remapping linearly
-            savingsRate < 0 -> 0.0 // In debt
-            savingsRate < 0.1 -> 0.3 // Low savings
-            savingsRate < 0.25 -> 0.7 // Good savings
-            else -> 1.0 // Excellent saver
+        val behaviorScore = when { // remapping linearly
+            savingsRate < 0 -> 0.0 // in debt
+            savingsRate < 0.1 -> 0.3 // low savings
+            savingsRate < 0.25 -> 0.7 // good savings
+            else -> 1.0 // excellent saver
         }
 
-        // Determine Labels
+        // Gi ve Labels
         val behaviorLabel = if (behaviorScore > 0.6) "Saver" else "Spender"
         val adherenceLabel = if (adherenceScore > 0.6) "Planner" else "Chaotic"
 

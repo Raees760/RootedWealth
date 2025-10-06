@@ -11,13 +11,13 @@ import kotlin.random.Random
 
 object BankLinkSimulator {
 
-    // This is the main function to call to seed the data
+    // this is the main function to call to seed the data
     suspend fun seedLinkedData(
         categoryDao: CategoryDao,
         expenseDao: ExpenseDao,
         incomeDao: IncomeDao
     ) {
-        // --- SEED MONTHLY INCOME ---
+        // MONTHLY INCOME
         incomeDao.insert(Income(
             amount = 25000.0,
             date = getDate(dayOfMonth = 25),
@@ -26,7 +26,7 @@ object BankLinkSimulator {
             isLinked = true
         ))
 
-        // --- SEED RECURRING EXPENSES (BILLS) ---
+        // RECURRING EXPENSES (BILLS)
         val rentCat = categoryDao.getCategoryByName("Rent")
         rentCat?.let {
             expenseDao.insert(Expense(
@@ -43,12 +43,12 @@ object BankLinkSimulator {
             ))
         }
 
-        // --- SEED VARIABLE EXPENSES ---
+        // VARIABLE EXPENSES
         val groceriesCat = categoryDao.getCategoryByName("Groceries")
         val transportCat = categoryDao.getCategoryByName("Transport")
         val takeoutCat = categoryDao.getCategoryByName("Takeout")
 
-        // Seed some random groceries and transport expenses throughout the month
+        // make some random groceries and transport expenses throughout the month
         for (i in 1..10) {
             groceriesCat?.let {
                 expenseDao.insert(Expense(
@@ -65,7 +65,7 @@ object BankLinkSimulator {
                 ))
             }
             takeoutCat?.let {
-                if(i < 4) { // Only a few takeouts
+                if(i < 4) { // only a few takeouts
                     expenseDao.insert(Expense(
                         amount = Random.nextDouble(90.0, 280.0),
                         date = getDate(Random.nextInt(2, 28)),

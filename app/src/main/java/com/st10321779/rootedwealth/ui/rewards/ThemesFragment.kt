@@ -34,7 +34,7 @@ class ThemesFragment : Fragment() {
                 PrefsManager.purchaseTheme(requireContext(), theme.id)
                 Toast.makeText(context, "${theme.name} purchased!", Toast.LENGTH_SHORT).show()
                 (activity as? RewardsActivity)?.updateCoinBalance()
-                // In a real app, you would notify the adapter to refresh its view
+                //otify the adapter to refresh its view
             } else {
                 Toast.makeText(context, "Not enough coins!", Toast.LENGTH_SHORT).show()
             }

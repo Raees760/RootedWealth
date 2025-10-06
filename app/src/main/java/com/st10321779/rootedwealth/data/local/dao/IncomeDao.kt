@@ -28,7 +28,7 @@ interface IncomeDao {
     @Query("SELECT * FROM income WHERE id = :incomeId LIMIT 1")
     suspend fun getIncomeById(incomeId: Long): Income?
 
-    // For Analytics
+    //Analytics
     @Query("SELECT IFNULL(SUM(amount), 0) FROM income WHERE date BETWEEN :startDate AND :endDate")
     suspend fun getTotalIncomeInPeriodAsync(startDate: Date, endDate: Date): Double
 

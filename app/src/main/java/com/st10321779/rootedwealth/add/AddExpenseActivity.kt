@@ -44,10 +44,10 @@ class AddExpenseActivity : AppCompatActivity() {
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            // Permission granted, launch the image picker
+            //Permission granted, launch the image picker
             imagePickerLauncher.launch("image/*")
         } else {
-            // Permission denied, show a toast
+            //Permission denied, show a toast
             Toast.makeText(this, "Permission denied to read storage", Toast.LENGTH_SHORT).show()
         }
     }
@@ -63,7 +63,7 @@ class AddExpenseActivity : AppCompatActivity() {
                 this,
                 permission
             ) == PackageManager.PERMISSION_GRANTED -> {
-                // Permission is already granted, launch the image picker
+                //Permission is already granted, launch the image picker
                 imagePickerLauncher.launch("image/*")
             }
             else -> {
@@ -142,12 +142,12 @@ class AddExpenseActivity : AppCompatActivity() {
             date = selectedDate,
             categoryId = selectedCategory.id,
             notes = notes,
-            imageUri = null // Image functionality can be added here
+            imageUri = null
         )
 
         viewModel.addExpense(newExpense)
         Toast.makeText(this, "Expense saved!", Toast.LENGTH_SHORT).show()
-        finish() // Close the activity after saving
+        finish() // close the activity after saving
     }
     private fun copyImageToInternalStorage(uri: Uri): Uri? {
         return try {
@@ -158,7 +158,7 @@ class AddExpenseActivity : AppCompatActivity() {
             inputStream?.close()
             outputStream.close()
 
-            // THE KEY CHANGE: Get a secure content:// URI from the FileProvider
+            // URI from the FileProvider
             val authority = "${applicationContext.packageName}.provider"
             FileProvider.getUriForFile(this, authority, file)
         } catch (e: Exception) {
