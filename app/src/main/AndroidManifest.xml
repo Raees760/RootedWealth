@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- For API 33 and above -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <!-- For versions up to API 32 -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" /> <!-- For versions up to API 32 -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -17,21 +17,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.RootedWealth">
-
-
-        <activity android:name=".add.AddExpenseActivity" />
-        <activity android:name=".settings.SettingsActivity" />
-        <activity android:name=".ui.rewards.RewardsActivity" />
-        <activity android:name=".add.AddIncomeActivity" />
-        <activity android:name=".ui.edit.EditActivity" android:label="Edit Transaction" />
-        <activity android:name=".ui.categories.CategoryManagerActivity" android:label="Manage Categories" />
         <activity
-            android:name=".ui.tutorial.TutorialActivity"
-            android:label="Tutorial"
-            android:parentActivityName=".MainActivity" />
-
+            android:name=".Register"
+            android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Login"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,14 +29,33 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".add.AddExpenseActivity" />
+        <activity android:name=".settings.SettingsActivity" />
+        <activity android:name=".ui.rewards.RewardsActivity" />
+        <activity android:name=".add.AddIncomeActivity" />
+        <activity
+            android:name=".ui.edit.EditActivity"
+            android:label="Edit Transaction" />
+        <activity
+            android:name=".ui.categories.CategoryManagerActivity"
+            android:label="Manage Categories" />
+        <activity
+            android:name=".ui.tutorial.TutorialActivity"
+            android:label="Tutorial"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+        </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">
-        <meta-data
-            android:name="android.support.FILE_PROVIDER_PATHS"
-            android:resource="@xml/file_paths" />
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
         </provider>
     </application>
 

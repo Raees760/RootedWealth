@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "235029959273",
+    "project_id": "rootedwealth-ff9de",
+    "storage_bucket": "rootedwealth-ff9de.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:235029959273:android:2419f30935a584c11148f8",
+        "android_client_info": {
+          "package_name": "com.st10321779.rootedwealth"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBA2uqCgKsSF2OzElTIaWPqHiTCpgaGF8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
