@@ -58,7 +58,12 @@ class Login : AppCompatActivity() {
                 Toast.makeText(this, "Enter password", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
+            // ------------CODE ATTRIBUTION------------
+            //Title: Firebase Authentication
+            //Author: Google
+            // Date: 05/10/2025
+            // Code Version:(N/A)
+            // Availability https://firebase.google.com/docs/auth/android/password-auth
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
@@ -77,7 +82,7 @@ class Login : AppCompatActivity() {
                     }
                 }
         }
-
+// ---------END OF CODE ATTRIBUTION---------
         // register screen
         tvRedirectSignUp.setOnClickListener {
             val intent = Intent(this, Register::class.java)

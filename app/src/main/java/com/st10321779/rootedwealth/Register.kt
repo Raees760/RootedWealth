@@ -54,7 +54,12 @@ class Register : AppCompatActivity() {
                 Toast.makeText(this, "Enter password", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
+            // ------------CODE ATTRIBUTION------------
+            //Title: Firebase Authentication
+            //Author: Google
+            // Date: 05/10/2025
+            // Code Version:(N/A)
+            // Availability https://firebase.google.com/docs/auth/android/password-auth
             // create user in Firebase
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
@@ -67,6 +72,8 @@ class Register : AppCompatActivity() {
                         intent.putExtra("email", email) // pre-fill email in login (i noticed this doesn't actually work?)
                         startActivity(intent)
                         finish() // close Register screen
+
+                        // ---------END OF CODE ATTRIBUTION---------
                     } else {
                         Log.w(TAG, "createUserWithEmail:failure", task.exception)
                         Toast.makeText(
