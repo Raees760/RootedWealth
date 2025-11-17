@@ -28,4 +28,4 @@ RootedWealth is a mobile application designed to help users manage their finance
 
 ## 📽 Video Demonstration
 Part 2: https://youtu.be/gTT9PxJigKc
-Part 3: coming soon...
+Part 3: https://youtu.be/-BPLB9sLV2g
