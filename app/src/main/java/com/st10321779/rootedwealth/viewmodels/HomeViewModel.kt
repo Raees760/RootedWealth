@@ -1,6 +1,8 @@
 package com.st10321779.rootedwealth.viewmodels
 
 import android.app.Application
+import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.st10321779.rootedwealth.data.local.dao.CategorySpending
@@ -9,7 +11,9 @@ import com.st10321779.rootedwealth.data.local.entity.Expense
 import com.st10321779.rootedwealth.data.local.entity.Income
 import com.st10321779.rootedwealth.repository.FirebaseRepository
 import com.st10321779.rootedwealth.util.PrefsManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.random.Random
 
@@ -46,12 +50,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         // When raw data changes, trigger recalculations
-        totalSpentThisMonth.addSource(allExpenses) { recalculateTotals() }
+        totalSpentThisMonth.addSource(allExpenses) {
+            recalculateTotals()
+            checkWeeklyChallenges() // Trigger the check
+        }
         totalIncomeThisMonth.addSource(allIncome) { recalculateTotals() }
 
         // Update the pie chart data when expenses or categories change
         spendingByCategory.addSource(allExpenses) { recalculateCategorySpending() }
         spendingByCategory.addSource(allCategories) { recalculateCategorySpending() }
+
 
         refreshUiState()
         seedDefaultCategoriesIfFirstTime()
@@ -137,5 +145,64 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val endDate = calendar.time
 
         return Pair(startDate, endDate)
+    }
+    private fun checkWeeklyChallenges() {
+        // These challenges only apply if the bank account is linked
+        if (!PrefsManager.isBankLinked(getApplication())) return
+
+        val expenses = allExpenses.value ?: return
+        val categories = allCategories.value ?: return
+        if (expenses.isEmpty() || categories.isEmpty()) return
+
+        val end = Calendar.getInstance().time
+        val startCal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -7) }
+        val start = startCal.time
+
+        val weeklyExpenses = expenses.filter { it.date in start..end }
+
+        // Challenge: "Home Meals Are Best"
+        val takeoutCat = categories.find { it.name == "Takeout" }
+        if (takeoutCat != null) {
+            val takeawaySpend = weeklyExpenses
+                .filter { it.categoryId == takeoutCat.id }
+                .sumOf { it.amount }
+
+            val achievementId = "home_meals_challenge"
+            // We'll reset this achievement weekly, so we just check if it's already unlocked in this session
+            // A more robust system would use PrefsManager to store the "last earned date"
+            if (takeawaySpend < 500 && !PrefsManager.hasAchievement(getApplication(), achievementId)) {
+                awardAchievement(getApplication(), achievementId, 75, "Challenge Complete: Home Meals Are Best!")
+            }
+        }
+
+        // Challenge: "The Simple Life"
+        val luxuryCategoryNames = listOf("Entertainment", "Takeout")
+        val luxuryCategoryIds = categories
+            .filter { it.name in luxuryCategoryNames }
+            .map { it.id }
+
+        if (luxuryCategoryIds.isNotEmpty()) {
+            val luxurySpend = weeklyExpenses
+                .filter { it.categoryId in luxuryCategoryIds }
+                .sumOf { it.amount }
+
+            val achievementId = "simple_life_challenge"
+            if (luxurySpend < 1500 && !PrefsManager.hasAchievement(getApplication(), achievementId)) {
+                awardAchievement(getApplication(), achievementId, 75, "Challenge Complete: The Simple Life!")
+            }
+        }
+    }
+
+    // A helper to award achievements from the ViewModel
+    private fun awardAchievement(context: Context, id: String, coins: Int, message: String) {
+        // Since we are in a ViewModel, we must use viewModelScope to ensure this runs correctly
+        viewModelScope.launch {
+            PrefsManager.addCoins(context, coins)
+            PrefsManager.setAchievementUnlocked(context, id)
+            // Show the Toast on the Main thread
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            }
+        }
     }
 }

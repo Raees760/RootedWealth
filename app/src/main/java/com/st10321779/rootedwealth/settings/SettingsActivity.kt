@@ -93,9 +93,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.btnRunEndOfMonth.setOnClickListener {
-            lifecycleScope.launch {
-                GamificationEngine.processEndOfMonth(this@SettingsActivity)
-            }
+            viewModel.runEndOfMonthChecks()
         }
     }
 

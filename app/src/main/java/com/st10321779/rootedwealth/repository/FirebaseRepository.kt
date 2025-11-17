@@ -134,7 +134,8 @@ class FirebaseRepository {
     // One-time fetch for default categories
     suspend fun hasDefaultCategories(): Boolean = suspendCoroutine { continuation ->
         val categoriesRef = getUserDataRef()?.child("categories")
-        categoriesRef?.orderByChild("default")?.equalTo(true)?.limitToFirst(1)
+
+        categoriesRef?.orderByChild("isDefault")?.equalTo(true)?.limitToFirst(1)
             ?.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     continuation.resume(snapshot.exists())
@@ -144,7 +145,6 @@ class FirebaseRepository {
                 }
             }) ?: continuation.resume(false)
     }
-
     fun seedDefaultCategories() {
         val defaults = listOf(
             Category(name = "Groceries", color = "#4CAF50", isDefault = true),
@@ -271,5 +271,17 @@ class FirebaseRepository {
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
         return calendar.time
+    }
+    suspend fun getExpensesOneTime(): List<Expense> = suspendCoroutine { continuation ->
+        val expensesRef = getUserDataRef()?.child("expenses")
+        expensesRef?.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val items = snapshot.children.mapNotNull { it.getValue(Expense::class.java) }
+                continuation.resume(items)
+            }
+            override fun onCancelled(error: DatabaseError) {
+                continuation.resume(emptyList())
+            }
+        }) ?: continuation.resume(emptyList())
     }
 }
