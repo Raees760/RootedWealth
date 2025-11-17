@@ -6,30 +6,82 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.st10321779.rootedwealth.MainActivity
-import com.st10321779.rootedwealth.databinding.ActivitySettingsBinding
-import com.st10321779.rootedwealth.theme.ThemeManager
-import com.st10321779.rootedwealth.theme.ThemeRepository
-import com.st10321779.rootedwealth.util.PrefsManager
-import com.st10321779.rootedwealth.viewmodels.HomeViewModel
-import androidx.lifecycle.lifecycleScope
-import com.st10321779.rootedwealth.gamification.GamificationEngine
-import com.st10321779.rootedwealth.ui.categories.CategoryManagerActivity
-import kotlinx.coroutines.launch
 import com.google.firebase.auth.FirebaseAuth
 import com.st10321779.rootedwealth.Login
+import com.st10321779.rootedwealth.MainActivity
+import com.st10321779.rootedwealth.R
+import com.st10321779.rootedwealth.databinding.ActivitySettingsBinding
+import com.st10321779.rootedwealth.gamification.GamificationEngine
+import com.st10321779.rootedwealth.theme.AppTheme
+import com.st10321779.rootedwealth.theme.ThemeManager
+import com.st10321779.rootedwealth.ui.categories.CategoryManagerActivity
+import com.st10321779.rootedwealth.util.PrefsManager
+import com.st10321779.rootedwealth.viewmodels.HomeViewModel
+import com.st10321779.rootedwealth.viewmodels.SettingsViewModel
+import androidx.lifecycle.lifecycleScope
+import com.st10321779.rootedwealth.repository.FirebaseRepository
+import kotlinx.coroutines.launch
 
 class SettingsActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivitySettingsBinding
+    private val viewModel: SettingsViewModel by viewModels()
+    private val homeViewModel: HomeViewModel by viewModels()
+
+    // This list will be populated by the ViewModel with only the themes the user owns
+    private var availableThemes: List<AppTheme> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Apply the currently active theme for consistent visuals
         ThemeManager.applyTheme(this, ThemeManager.getSelectedTheme(this), binding.root)
 
-        setupThemeSpinner()
-        loadCurrentSettings()
+        loadNonThemeSettings()
+        observeViewModel()
+        setupClickListeners()
+    }
+
+    private fun observeViewModel() {
+        viewModel.themeSettingsState.observe(this) { state ->
+            // The ViewModel gives us the final list of owned themes and which one to pre-select
+            availableThemes = state.availableThemes
+
+            val adapter = ArrayAdapter(
+                this,
+                R.layout.spinner_item_themed,
+                availableThemes.map { it.displayName }
+            )
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.spinnerThemes.adapter = adapter
+
+            // Set the spinner to the correct pre-selected theme
+            if (state.selectedThemeIndex < availableThemes.size) {
+                binding.spinnerThemes.setSelection(state.selectedThemeIndex)
+            }
+        }
+    }
+
+    private fun setupClickListeners() {
+        binding.btnSaveSettings.setOnClickListener {
+            saveAndApplySettings()
+        }
+
+        binding.switchDark.setOnCheckedChangeListener { _, isChecked ->
+            ThemeManager.saveDarkMode(this, isChecked)
+            // Re-apply the current theme with the new dark mode setting for instant feedback
+            ThemeManager.applyTheme(this, ThemeManager.getSelectedTheme(this), binding.root)
+        }
+
+        binding.btnLogout.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+            val intent = Intent(this, Login::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(intent)
+            finish()
+        }
 
         binding.btnManageCategories.setOnClickListener {
             startActivity(Intent(this, CategoryManagerActivity::class.java))
@@ -41,80 +93,65 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.btnRunEndOfMonth.setOnClickListener {
-            // launch a coroutine to call the suspend function
             lifecycleScope.launch {
                 GamificationEngine.processEndOfMonth(this@SettingsActivity)
             }
         }
-
-        binding.btnSaveSettings.setOnClickListener {
-            saveAndApplySettings()
-        }
-
-        //apply dark mode instantly for better UX
-        binding.switchDark.setOnCheckedChangeListener { _, isChecked ->
-            ThemeManager.saveDarkMode(this, isChecked)
-            ThemeManager.applyTheme(this, ThemeManager.getSelectedTheme(this), binding.root)
-        }
-        // logout Listener
-        binding.btnLogout.setOnClickListener {
-            //sign out from Firebase
-            FirebaseAuth.getInstance().signOut()
-
-            //go to the login screen
-            val intent = Intent(this, Login::class.java)
-            // =these flags clear the entire task stack, so the user can't press "back" to get into the app again
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            startActivity(intent)
-            finish() //close the settings activity
-        }
     }
 
-    private fun setupThemeSpinner() {
-        val themes = ThemeRepository.all
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, themes.map { it.displayName })
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerThemes.adapter = adapter
-    }
-
-    private fun loadCurrentSettings() {
-        //Theme
-        val themes = ThemeRepository.all
-        val selectedTheme = ThemeManager.getSelectedTheme(this)
-        binding.spinnerThemes.setSelection(themes.indexOfFirst { it.id == selectedTheme.id })
-
-        //Dark Mode
+    // This function only loads settings NOT related to the theme spinner
+    private fun loadNonThemeSettings() {
         binding.switchDark.isChecked = ThemeManager.isDarkMode(this)
-
-        //Budget
-        binding.etMonthlyBudget.setText(PrefsManager.getMonthlyBudget(this).toString())
-
-        //Bank Link
+        binding.etMinimumBudget.setText(PrefsManager.getMinimumMonthlyBudget(this).toString())
+        binding.etMaximumBudget.setText(PrefsManager.getMaximumMonthlyBudget(this).toString())
         binding.switchLinkBank.isChecked = PrefsManager.isBankLinked(this)
     }
 
     private fun saveAndApplySettings() {
-        //Theme
-        val themes = ThemeRepository.all
-        val selectedTheme = themes[binding.spinnerThemes.selectedItemPosition]
-        ThemeManager.saveSelectedTheme(this, selectedTheme.id)
-
-        //Budget
-        val budget = binding.etMonthlyBudget.text.toString().toFloatOrNull() ?: 0.0f
-        if (budget > 0) {
-            PrefsManager.saveMonthlyBudget(this, budget)
+        if (availableThemes.isEmpty()) {
+            Toast.makeText(this, "No themes available to save.", Toast.LENGTH_SHORT).show()
+            return
         }
 
-        //Bank Link
-        val isBankLinked = binding.switchLinkBank.isChecked
-        PrefsManager.setBankLinked(this, isBankLinked)
-        //notify the ViewModel to run the seeder if needed
-        val homeViewModel: HomeViewModel by viewModels()
-        homeViewModel.onBankLinkStatusChanged(isBankLinked)
+        // Save Theme Selection
+        val selectedTheme = availableThemes[binding.spinnerThemes.selectedItemPosition]
+        ThemeManager.saveSelectedTheme(this, selectedTheme.id)
 
-        Toast.makeText(this, "Settings Saved! Applying changes...", Toast.LENGTH_SHORT).show()
+        //Save Budget Settings
+        val minBudget = binding.etMinimumBudget.text.toString().toFloatOrNull() ?: 0.0f
+        val maxBudget = binding.etMaximumBudget.text.toString().toFloatOrNull() ?: 0.0f
+        PrefsManager.saveMinimumMonthlyBudget(this, minBudget)
+        PrefsManager.saveMaximumMonthlyBudget(this, maxBudget)
 
-        // force a full restart to apply theme correctly
+        // Save Bank Link Status
+
+        val isNowLinked = binding.switchLinkBank.isChecked
+        val wasPreviouslyLinked = PrefsManager.isBankLinked(this)
+
+        PrefsManager.setBankLinked(this, isNowLinked)
+
+        if (isNowLinked && !wasPreviouslyLinked) {
+            Toast.makeText(this, "Linking account and seeding data...", Toast.LENGTH_LONG).show()
+
+            // Use the activity's own lifecycleScope to launch the coroutine.
+            // This scope will stay alive until the activity is truly destroyed.
+            lifecycleScope.launch {
+                val repository = FirebaseRepository()
+                repository.seedBankLinkData()
+
+                // Set the flag AFTER the seeding is complete.
+                PrefsManager.setBankDataSeeded(this@SettingsActivity, true)
+
+                // Now, restart the app.
+                restartApp()
+            }
+        } else {
+            // If no seeding is needed, just restart immediately.
+            restartApp()
+        }
+    }
+    private fun restartApp() {
+        Toast.makeText(this, "Settings Saved! Restarting...", Toast.LENGTH_SHORT).show()
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)

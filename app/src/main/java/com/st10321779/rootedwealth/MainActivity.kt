@@ -3,6 +3,8 @@ package com.st10321779.rootedwealth
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.st10321779.rootedwealth.add.AddExpenseActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -37,6 +39,16 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         // set the content view to the root of the binding
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.container) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // We get the height of the BottomAppBar
+            val bottomNavHeight = binding.bottomAppBar.height
+            // We apply padding to the container. The bottom padding is the sum of the system nav bar and our app's nav bar.
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom +80)
+            // Return the insets to allow other views to process them
+            insets
+        }
 
         // set initial fragment
         if (savedInstanceState == null) {

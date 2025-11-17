@@ -57,14 +57,16 @@ class HomeFragment : Fragment() {
 
     private fun observeViewModel() {
         var currentSpent = 0.0
-        var currentBudget = 0.0f
+        var currentMinBudget = 0.0f
+        var currentMaxBudget = 0.0f
         homeViewModel.totalSpentThisMonth.observe(viewLifecycleOwner) { spent ->
             currentSpent = spent ?: 0.0
-            updateBudgetSummary(currentSpent, currentBudget.toDouble())
+            updateBudgetSummary(currentSpent, currentMinBudget.toDouble(), currentMaxBudget.toDouble())
         }
-        homeViewModel.monthlyBudget.observe(viewLifecycleOwner) { budget ->
-            currentBudget = budget
-            updateBudgetSummary(currentSpent, currentBudget.toDouble())
+        homeViewModel.budgetGoals.observe(viewLifecycleOwner) { (min, max)  ->
+            currentMinBudget = min
+            currentMaxBudget = max
+            updateBudgetSummary(currentSpent, currentMinBudget.toDouble(), currentMaxBudget.toDouble())
         }
 
         // Placeholder data for pie chart
@@ -100,10 +102,12 @@ class HomeFragment : Fragment() {
         val currencyFormat = NumberFormat.getCurrencyInstance(Locale("en", "ZA"))
         binding.pieChart.centerText = "Income: ${currencyFormat.format(income)}\nSpent: ${currencyFormat.format(spent)}"
     }
-    private fun updateBudgetSummary(spent: Double, budget: Double) {
+    private fun updateBudgetSummary(spent: Double, minBudget: Double, budget: Double) {
         val currencyFormat = NumberFormat.getCurrencyInstance(Locale("en", "ZA"))
+        // Update the main budget ratio text
         binding.tvBudgetRatio.text = "${currencyFormat.format(spent)} / ${currencyFormat.format(budget)}"
 
+        // Update the progress bar based on the MAX budget
         val progress = if (budget > 0) (spent / budget * 100).toInt() else 0
         binding.pbMonthlyProgress.progress = progress
 
@@ -113,6 +117,19 @@ class HomeFragment : Fragment() {
             else -> R.color.budget_red
         }
         binding.pbMonthlyProgress.progressTintList = ContextCompat.getColorStateList(requireContext(), progressColor)
+
+        // Add a visual/textual indicator for the minimum goal
+        if (minBudget > 0) {
+            binding.tvMinGoalStatus.visibility = View.VISIBLE
+            if (spent < minBudget) {
+                val percentToMin = (spent / minBudget * 100).toInt()
+                binding.tvMinGoalStatus.text = "Minimum goal progress: $percentToMin%"
+            } else {
+                binding.tvMinGoalStatus.text = "✓ Minimum spending goal reached!"
+            }
+        } else {
+            binding.tvMinGoalStatus.visibility = View.GONE
+        }
     }
 
     private fun setupPieChart() {

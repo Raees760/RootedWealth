@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
     alias(libs.plugins.google.gms.google.services)
+    //id("com.android.application")
+    //id("com.google.gms.google-services")
 }
 
 android {
@@ -66,4 +68,11 @@ dependencies {
     implementation("androidx.viewpager2:viewpager2:1.0.0")
 
     implementation("com.github.QuadFlask:colorpicker:0.0.13") // For Colour Picker
+
+    //For Realtime Online Database
+    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
+    //implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-analytics")
 }

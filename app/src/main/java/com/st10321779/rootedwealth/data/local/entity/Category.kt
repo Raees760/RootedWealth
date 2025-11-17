@@ -5,10 +5,11 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "categories")
 data class Category(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val name: String,
-    val icon: String, // placeholder for icon resource name
-    val color: String, //hex color string e.g., #FF5733
-    val isDefault: Boolean,
+    @PrimaryKey
+    var id: String = "", // Changed to String, and a 'var'
+    var name: String = "",
+    var icon: String = "", // placeholder for icon resource name
+    var color: String = "", //hex color string e.g., #FF5733
+    var isDefault: Boolean = false,
     var isActive: Boolean = true
 )

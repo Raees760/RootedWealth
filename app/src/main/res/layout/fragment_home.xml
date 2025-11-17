@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/home_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -74,6 +75,14 @@
                     android:tag="themed_text"
                     android:layout_gravity="end"
                     android:layout_marginTop="4dp"/>
+                <TextView
+                android:id="@+id/tvMinGoalStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:tag="themed_text"
+                android:layout_gravity="end"
+                android:textStyle="italic"
+                tools:text="Minimum goal progress: 50%" />
 
                 <!-- Streaks and Coins placeholder -->
                 <LinearLayout

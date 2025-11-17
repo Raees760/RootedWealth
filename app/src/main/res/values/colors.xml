@@ -9,9 +9,9 @@
     <color name="text_default">#212121</color>
 
     <!-- rosy -->
-    <color name="rosy_panel">#FCE4EC</color>
+    <color name="rosy_panel">#FFCFDF</color>
     <color name="rosy_accent">#F06292</color>
-    <color name="text_on_rosy">#4A148C</color>
+    <color name="text_on_rosy">#3E255B</color>
 
     <!-- spiderman (fallback color if image not available) -->
     <color name="spiderman_fallback">#0D47A1</color>

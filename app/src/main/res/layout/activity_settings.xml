@@ -43,11 +43,25 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp">
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etMonthlyBudget"
+            android:id="@+id/etMinimumBudget"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Monthly Budget (ZAR)"
-            android:inputType="numberDecimal"/>
+            android:hint="Minimum Monthly Spending Goal (e.g., for Investments)"
+            android:inputType="numberDecimal"
+            android:tag="themed_input"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etMaximumBudget"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Maximum Monthly Budget (Spending Cap)"
+            android:inputType="numberDecimal"
+            android:tag="themed_input"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button

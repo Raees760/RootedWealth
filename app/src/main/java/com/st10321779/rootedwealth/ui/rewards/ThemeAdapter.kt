@@ -4,24 +4,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.st10321779.rootedwealth.R
 import com.st10321779.rootedwealth.databinding.ItemRewardsThemeBinding
 import com.st10321779.rootedwealth.theme.ThemeRepository
-import com.st10321779.rootedwealth.util.PrefsManager
 
 class ThemeAdapter(
     private val themes: List<RewardTheme>,
+    private var purchasedThemeIds: List<String>, // Now a mutable property
     private val onBuyClicked: (RewardTheme) -> Unit
 ) : RecyclerView.Adapter<ThemeAdapter.ThemeViewHolder>() {
 
     inner class ThemeViewHolder(val binding: ItemRewardsThemeBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ThemeViewHolder {
-        val binding = ItemRewardsThemeBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
+        val binding = ItemRewardsThemeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ThemeViewHolder(binding)
     }
 
@@ -29,13 +24,10 @@ class ThemeAdapter(
 
     override fun onBindViewHolder(holder: ThemeViewHolder, position: Int) {
         val theme = themes[position]
-        val context = holder.itemView.context
-        val purchasedThemes = PrefsManager.getPurchasedThemes(context)
 
         with(holder.binding) {
             tvThemeName.text = theme.name
 
-            // Set a representative image for each theme
             val themeData = ThemeRepository.findById(theme.id)
             if (themeData.panelUsesImage && themeData.panelDrawableRes != null) {
                 ivThemePreview.setImageResource(themeData.panelDrawableRes)
@@ -43,8 +35,8 @@ class ThemeAdapter(
                 ivThemePreview.setImageResource(themeData.primaryColorRes)
             }
 
-
-            if (theme.id in purchasedThemes) {
+            // The check is now against the property passed into the adapter
+            if (theme.id in purchasedThemeIds) {
                 btnBuyTheme.isEnabled = false
                 btnBuyTheme.text = "Owned"
                 tvThemePrice.visibility = View.GONE
@@ -53,11 +45,14 @@ class ThemeAdapter(
                 btnBuyTheme.text = "Buy"
                 tvThemePrice.visibility = View.VISIBLE
                 tvThemePrice.text = "💰 ${theme.price} Coins"
-            }
-
-            btnBuyTheme.setOnClickListener {
-                onBuyClicked(theme)
+                btnBuyTheme.setOnClickListener { onBuyClicked(theme) }
             }
         }
+    }
+
+    // New function to update the list from the Fragment's observer
+    fun updatePurchasedThemes(newPurchasedIds: List<String>) {
+        this.purchasedThemeIds = newPurchasedIds
+        notifyDataSetChanged() // Redraw the entire list
     }
 }

@@ -6,17 +6,19 @@ import java.util.Date
 
 @Entity(tableName = "expenses")
 data class Expense(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val amount: Double,
-    val date: Date,
-    val categoryId: Long,
-    val notes: String?,
-    val imageUri: String?, // store URI of the image
+    @PrimaryKey
+    var id: String = "", // Changed to String, and a 'var'
+    var amount: Double = 0.0,
+    var date: Date = Date(),
+    var categoryId: String = "", // Must also be a String
+    var notes: String? = null,
+    var imageUri: String? = null, // store URI of the image
+    var isDefault: Boolean = false, // Added for default categories
     val isLinked: Boolean = false //for  bank entries
 )
 data class ExpenseWithCategory(
     // don't need @Embedded here since we are selecting columns individually
-    val id: Long,
+    val id: String, // Changed to String
     val amount: Double,
     val date: Date,
     val notes: String?,

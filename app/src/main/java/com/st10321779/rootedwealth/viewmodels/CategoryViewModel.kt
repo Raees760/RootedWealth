@@ -6,31 +6,35 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.st10321779.rootedwealth.data.local.AppDatabase
 import com.st10321779.rootedwealth.data.local.entity.Category
+import com.st10321779.rootedwealth.data.local.entity.Expense
+import com.st10321779.rootedwealth.repository.FirebaseRepository
 import kotlinx.coroutines.launch
 
 class CategoryViewModel(application: Application) : AndroidViewModel(application) {
 
+    private val firebaseRepository = FirebaseRepository()
     private val categoryDao = AppDatabase.getDatabase(application).categoryDao()
-    val allCategories: LiveData<List<Category>> = categoryDao.getAllCategories()
+    val allCategories: LiveData<List<Category>> = firebaseRepository.getCategoriesLiveData()
+    private val allExpenses: LiveData<List<Expense>> = firebaseRepository.getExpensesLiveData()
+
 
     fun addCategory(category: Category) = viewModelScope.launch {
-        categoryDao.insert(category)
+        firebaseRepository.addCategory(category)
     }
-
     fun updateCategory(category: Category) = viewModelScope.launch {
-        categoryDao.update(category)
+        firebaseRepository.updateCategory(category)
     }
-
     fun deleteCategory(category: Category) = viewModelScope.launch {
-        // check if the category is in use
-        val expenseCount = categoryDao.getExpenseCountForCategory(category.id)
-        if (expenseCount > 0) {
-            // soft delete i.e. mark as inactive
+        // check if the category is in
+        val isCategoryInUse = allExpenses.value?.any { it.categoryId == category.id } ?: false
+
+        if (isCategoryInUse) {
+            // soft delete i.e. mark as inactive and update in Firebase
             val updatedCategory = category.copy(isActive = false)
-            categoryDao.update(updatedCategory)
+            firebaseRepository.updateCategory(updatedCategory)
         } else {
-            // hard delete - Remove from database
-            categoryDao.deleteById(category.id)
+            // Hard delete: Remove from Firebase
+            firebaseRepository.deleteCategory(category.id)
         }
     }
 }

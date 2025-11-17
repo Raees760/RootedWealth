@@ -3,15 +3,13 @@ package com.st10321779.rootedwealth.gamification
 import android.content.Context
 import android.widget.Toast
 import com.st10321779.rootedwealth.data.local.AppDatabase
+import com.st10321779.rootedwealth.repository.FirebaseRepository
 import com.st10321779.rootedwealth.util.PrefsManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Calendar
-import java.util.Date
-import java.util.concurrent.TimeUnit
-import kotlin.math.max
 
 object GamificationEngine {
 
@@ -38,13 +36,13 @@ object GamificationEngine {
 
     // ACHIEVEMENT & STREAK LOGIC
     private suspend fun checkAndAwardFirstExpenseAchievement(context: Context) {
-        val db = AppDatabase.getDatabase(context)
-        val count = db.expenseDao().getExpenseCount()
+        // This is a temporary fix. A better solution would be to not instantiate this in a utility class.
+        val firebaseRepository = FirebaseRepository()
+        val count = firebaseRepository.getExpenseCount()
         if (count == 1 && !PrefsManager.hasAchievement(context, "first_expense")) {
             awardAchievement(context, "first_expense", 50, "Achievement: Getting Started!")
         }
     }
-
     private suspend fun updateStreak(context: Context) {
         val lastLogMillis = PrefsManager.getLastLogDate(context)
         if (lastLogMillis == 0L) { // First ever log
@@ -125,7 +123,7 @@ object GamificationEngine {
         startCal.add(Calendar.MONTH, -1) //check last month's data
         val start = startCal.time
 
-        val totalBudget = PrefsManager.getMonthlyBudget(context)
+        val totalBudget = PrefsManager.getMaximumMonthlyBudget(context)
         val totalSpent = db.expenseDao().getTotalExpensesInPeriodAsync(start, end)
 
         if (totalSpent < totalBudget && !PrefsManager.hasAchievement(context, "under_budget_1")) {
@@ -136,7 +134,7 @@ object GamificationEngine {
 
     // HELPER FUNCTIONS
 
-    private fun awardAchievement(context: Context, id: String, coins: Int, message: String) {
+    private suspend fun awardAchievement(context: Context, id: String, coins: Int, message: String) {
         PrefsManager.addCoins(context, coins)
         PrefsManager.setAchievementUnlocked(context, id)
         // Run the Toast on the main thread
@@ -145,12 +143,12 @@ object GamificationEngine {
         }
     }
 
-    private fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {
+    private suspend fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
     }
 
-    private fun isConsecutiveDay(cal1: Calendar, cal2: Calendar): Boolean {
+    private suspend fun isConsecutiveDay(cal1: Calendar, cal2: Calendar): Boolean {
         // to correctly handle year boundaries, we check if cal1 is exactly one day before cal2
         val nextDayOfCal1 = cal1.clone() as Calendar
         nextDayOfCal1.add(Calendar.DAY_OF_YEAR, 1)

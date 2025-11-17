@@ -6,10 +6,11 @@ import java.util.Date
 
 @Entity(tableName = "income")
 data class Income(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val amount: Double,
-    val date: Date,
-    val source: String?,
-    val notes: String?,
-    val isLinked: Boolean = false
+    @PrimaryKey
+    var id: String = "",
+    var amount: Double = 0.0,
+    var date: Date = Date(),
+    var source: String? = null,
+    var notes: String? = null,
+    var isLinked: Boolean = false
 )

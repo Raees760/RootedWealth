@@ -7,7 +7,9 @@ import androidx.lifecycle.LiveData
 object PrefsManager {
     private const val PREFS_NAME = "app_prefs"
 
-    private const val KEY_MONTHLY_BUDGET = "monthly_budget"
+    private const val KEY_BANK_DATA_SEEDED = "bank_data_seeded"
+    private const val KEY_MAXIMUM_MONTHLY_BUDGET = "monthly_budget"
+    private const val KEY_MINIMUM_MONTHLY_BUDGET = "min_monthly_budget"
     private const val KEY_COIN_BALANCE = "coin_balance"
     private const val KEY_STREAK_COUNT = "streak_count"
     private const val KEY_LAST_LOG_DATE = "last_log_date"
@@ -19,19 +21,23 @@ object PrefsManager {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     // Budget
-    fun saveMonthlyBudget(context: Context, budget: Float) {
-        prefs(context).edit().putFloat(KEY_MONTHLY_BUDGET, budget).apply()
+    fun saveMaximumMonthlyBudget(context: Context, budget: Float) {
+        prefs(context).edit().putFloat(KEY_MAXIMUM_MONTHLY_BUDGET, budget).apply()
     }
-    fun getMonthlyBudget(context: Context): Float = prefs(context).getFloat(KEY_MONTHLY_BUDGET, 20000.0f)
+    fun getMaximumMonthlyBudget(context: Context): Float = prefs(context).getFloat(KEY_MAXIMUM_MONTHLY_BUDGET, 20000.0f)
 
-    fun getMonthlyBudgetLiveData(context: Context): LiveData<Float> {
+    fun saveMinimumMonthlyBudget(context: Context, budget: Float) {
+        prefs(context).edit().putFloat(KEY_MINIMUM_MONTHLY_BUDGET, budget).apply()
+    }
+    fun getMinimumMonthlyBudget(context: Context): Float = prefs(context).getFloat(KEY_MINIMUM_MONTHLY_BUDGET, 0.0f)
+    fun getBudgetLiveData(context: Context): LiveData<Pair<Float, Float>> {
         // this LiveData wrapper will emit a new value whenever the underlying preference changes.
-        return object : LiveData<Float>() {
+        return object : LiveData<Pair<Float, Float>>() {
             //the listener that reacts to preference changes.
             private val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-                if (key == KEY_MONTHLY_BUDGET) {
+                if (key == KEY_MAXIMUM_MONTHLY_BUDGET || key == KEY_MINIMUM_MONTHLY_BUDGET) {
                     // When the budget key changes, update the LiveData's value.
-                    value = getMonthlyBudget(context)
+                    value = Pair(getMinimumMonthlyBudget(context), getMaximumMonthlyBudget(context))
                 }
             }
 
@@ -39,7 +45,7 @@ object PrefsManager {
             override fun onActive() {
                 super.onActive()
                 // Eemit the current value immediately.
-                value = getMonthlyBudget(context)
+                value = Pair(getMinimumMonthlyBudget(context), getMaximumMonthlyBudget(context))
                 // register the listener to watch for future changes.
                 prefs(context).registerOnSharedPreferenceChangeListener(listener)
             }
@@ -104,5 +110,12 @@ object PrefsManager {
         val achievements = prefs(context).getStringSet(KEY_UNLOCKED_ACHIEVEMENTS, emptySet())?.toMutableSet()
         achievements?.add(id)
         prefs(context).edit().putStringSet(KEY_UNLOCKED_ACHIEVEMENTS, achievements).apply()
+    }
+    fun hasBankDataBeenSeeded(context: Context): Boolean {
+        return prefs(context).getBoolean(KEY_BANK_DATA_SEEDED, false)
+    }
+
+    fun setBankDataSeeded(context: Context, hasBeenSeeded: Boolean) {
+        prefs(context).edit().putBoolean(KEY_BANK_DATA_SEEDED, hasBeenSeeded).apply()
     }
 }

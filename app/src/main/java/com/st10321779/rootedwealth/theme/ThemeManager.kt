@@ -85,6 +85,10 @@ object ThemeManager {
                         v.setTextColor(text)
                         v.setHintTextColor(Color.argb(150, Color.red(text), Color.green(text), Color.blue(text)))
                     }
+                    if (v is com.google.android.material.textfield.TextInputLayout) {
+                        v.boxStrokeColor = accent
+                        v.hintTextColor = ContextCompat.getColorStateList(context, R.color.text_input_layout_hint_color)
+                    }
                 }
                 "themed_background_image" -> {
                     if (theme.panelUsesImage && theme.panelDrawableRes != null && v is ImageView) {
@@ -118,4 +122,18 @@ object ThemeManager {
         }
         // ---------------------------------------------------------
     }
+
+    fun getCalculatedTextColor(context: Context): Int {
+        val theme = getSelectedTheme(context)
+        val darkMode = isDarkMode(context)
+        var text = ContextCompat.getColor(context, theme.textColorRes)
+
+        // This is the same logic from applyTheme().
+        // It ensures we return the correct final color.
+        if (darkMode && !theme.panelUsesImage) {
+            text = Color.WHITE
+        }
+        return text
+    }
+
 }

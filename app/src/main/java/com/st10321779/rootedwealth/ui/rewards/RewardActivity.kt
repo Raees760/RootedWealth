@@ -1,6 +1,7 @@
 package com.st10321779.rootedwealth.ui.rewards
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayoutMediator
 import com.st10321779.rootedwealth.databinding.ActivityRewardsBinding
@@ -10,6 +11,7 @@ import com.st10321779.rootedwealth.util.PrefsManager
 class RewardsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRewardsBinding
+    private val viewModel: com.st10321779.rootedwealth.viewmodels.RewardsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
